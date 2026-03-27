@@ -5,31 +5,16 @@ import SectionTitle from "../common/SectionTitle";
 
 const samplePapers = [
   {
-    id: "paper-2023-pharmaceutics-1",
-    title: "Pharmaceutics 2023 Paper 1",
-    subject: "Pharmaceutics",
-    year: 2023,
-    duration: "1hr 45mins",
-    totalQuestions: 100,
-    freeQuestions: 20,
+    id: "waec-2020-math",
+    title: "WAEC 2020 Mathematics",
   },
   {
-    id: "paper-2022-pharmacology-1",
-    title: "Pharmacology 2022 Paper 1",
-    subject: "Pharmacology",
-    year: 2022,
-    duration: "1hr 45mins",
-    totalQuestions: 100,
-    freeQuestions: 20,
+    id: "waec-2021-english",
+    title: "WAEC 2021 English",
   },
   {
-    id: "paper-2021-pce-1",
-    title: "PCE 2021 Paper 1",
-    subject: "PCE",
-    year: 2021,
-    duration: "1hr 45mins",
-    totalQuestions: 100,
-    freeQuestions: 20,
+    id: "aum-sep-2021-pharmacology",
+    title: "AUM September 2021 Pharmacology",
   },
 ];
 

@@ -6,7 +6,7 @@ import SectionTitle from "@/components/common/SectionTitle";
 import PaperCard from "@/components/papers/PaperCard";
 import PaperFilter from "@/components/papers/PaperFilter";
 import PapersEmptyState from "@/components/papers/PapersEmptyState";
-import papers from "@/data/papers";
+import papers from "@/src/data/papers";
 
 export default function PapersPage() {
   const [searchTerm, setSearchTerm] = useState("");

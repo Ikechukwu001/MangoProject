@@ -71,7 +71,7 @@ export default function PaperCard({ paper }) {
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <Link
-          href={`/papers/${paper.id}`}
+          href={`/exam/${paper.id}`}
           className="inline-flex items-center justify-center rounded-2xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white shadow-md shadow-teal-200 transition hover:bg-teal-800"
         >
           View Paper

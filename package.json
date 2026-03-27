@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@paystack/inline-js": "^2.22.8",
     "@vercel/analytics": "^1.6.1",
     "lucide-react": "^0.563.0",
     "next": "^16.1.6",
