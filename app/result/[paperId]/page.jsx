@@ -14,6 +14,9 @@ import {
   BadgeCheck,
   BadgeX,
   Download,
+  Crown,
+  Lock,
+  Sparkles,
 } from "lucide-react";
 import Container from "@/components/layout/Container";
 
@@ -51,6 +54,9 @@ export default function ResultPage() {
 
   const passMark = 50;
   const passed = result ? result.percentage >= passMark : false;
+  const isPreviewMode = !!result?.previewMode;
+  const fullPaperQuestions = result?.fullPaperQuestions || result?.totalQuestions;
+  const previewCount = result?.freePreviewCount || result?.totalQuestions;
 
   const handlePrintSlip = () => {
     const printContents = slipRef.current?.innerHTML;
@@ -136,6 +142,10 @@ export default function ResultPage() {
               background: #fee2e2;
               color: #991b1b;
             }
+            .badge-preview {
+              background: #fef3c7;
+              color: #92400e;
+            }
             .meta {
               margin-top: 24px;
               font-size: 13px;
@@ -206,16 +216,71 @@ export default function ResultPage() {
       <Container>
         <div className="space-y-6">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">
-              PharmTechSuccess Result
-            </p>
-            <h1 className="mt-2 text-2xl font-bold text-slate-900 lg:text-3xl">
-              {result.paperTitle}
-            </h1>
-            <p className="mt-2 text-sm text-slate-500">
-              Pharmacy Technician CBT Result Summary
-            </p>
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-teal-700">
+                    PharmTechSuccess Result
+                  </p>
+
+                  {isPreviewMode && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-semibold text-amber-700">
+                      <Lock size={12} />
+                      Free Preview Result
+                    </span>
+                  )}
+
+                  {!isPreviewMode && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 text-[11px] font-semibold text-teal-700">
+                      <Crown size={12} />
+                      Full Paper Result
+                    </span>
+                  )}
+                </div>
+
+                <h1 className="mt-2 text-2xl font-bold text-slate-900 lg:text-3xl">
+                  {result.paperTitle}
+                </h1>
+
+                <p className="mt-2 text-sm text-slate-500">
+                  {isPreviewMode
+                    ? `Preview result for the first ${previewCount} questions in this paper`
+                    : "Pharmacy Technician CBT Result Summary"}
+                </p>
+              </div>
+            </div>
           </div>
+
+          {isPreviewMode && (
+            <div className="rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+                    <Sparkles size={18} />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-amber-800">
+                      You completed the free preview only
+                    </p>
+                    <p className="mt-1 text-sm text-amber-700">
+                      This result covers {result.totalQuestions} question
+                      {result.totalQuestions !== 1 ? "s" : ""} out of the full{" "}
+                      {fullPaperQuestions}-question paper. Upgrade to premium to unlock
+                      the complete paper and full exam flow.
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                >
+                  View Premium Access
+                  <Crown size={16} />
+                </Link>
+              </div>
+            </div>
+          )}
 
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -268,7 +333,9 @@ export default function ResultPage() {
                     Performance Overview
                   </h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    Overall exam performance and review summary
+                    {isPreviewMode
+                      ? "Preview performance based on the free accessible questions"
+                      : "Overall exam performance and review summary"}
                   </p>
                 </div>
 
@@ -314,6 +381,19 @@ export default function ResultPage() {
                   </p>
                 </div>
               </div>
+
+              {isPreviewMode && (
+                <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                  <p className="text-sm font-semibold text-amber-800">
+                    Preview scope
+                  </p>
+                  <p className="mt-1 text-sm text-amber-700">
+                    You attempted {result.totalQuestions} question
+                    {result.totalQuestions !== 1 ? "s" : ""} from a full paper of{" "}
+                    {fullPaperQuestions} questions.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -340,7 +420,11 @@ export default function ResultPage() {
               </div>
 
               <p className="mt-4 text-sm text-slate-600">
-                {passed
+                {isPreviewMode
+                  ? passed
+                    ? "Strong preview performance. Unlock the full paper to test yourself across all questions."
+                    : "This preview result helps you identify weak areas early. Unlock the full paper for deeper practice."
+                  : passed
                   ? "Congratulations. Your performance meets the required benchmark for this Pharm Tech CBT."
                   : "Your score is below the required benchmark for this Pharm Tech CBT. Review the corrections and try again."}
               </p>
@@ -361,6 +445,16 @@ export default function ResultPage() {
                   <Download size={18} />
                   Download Result Slip
                 </button>
+
+                {isPreviewMode && (
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-amber-400"
+                  >
+                    <Crown size={18} />
+                    Unlock Full Paper
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -373,11 +467,25 @@ export default function ResultPage() {
               PharmTechSuccess Official Slip
             </p>
             <h2 className="mt-2 text-2xl font-bold text-slate-900">
-              CBT Result Slip
+              {isPreviewMode ? "CBT Preview Result Slip" : "CBT Result Slip"}
             </h2>
             <p className="mt-1 text-sm text-slate-500">
               Pharmacy Technician Computer-Based Test
             </p>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {isPreviewMode ? (
+                <span className="inline-flex items-center gap-2 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-bold text-amber-700">
+                  <Lock size={16} />
+                  Free Preview Result
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2 rounded-2xl bg-teal-50 px-4 py-2 text-sm font-bold text-teal-700">
+                  <Crown size={16} />
+                  Full Paper Result
+                </span>
+              )}
+            </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -421,6 +529,24 @@ export default function ResultPage() {
                   {result.unansweredCount}
                 </p>
               </div>
+
+              {isPreviewMode && (
+                <>
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm text-slate-500">Preview Questions</p>
+                    <p className="mt-1 text-lg font-bold text-slate-900">
+                      {result.totalQuestions}
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-sm text-slate-500">Full Paper Questions</p>
+                    <p className="mt-1 text-lg font-bold text-slate-900">
+                      {fullPaperQuestions}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
 
             <div
@@ -443,12 +569,23 @@ export default function ResultPage() {
           </div>
 
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Question Review
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Review each question, your selected answer, and the correct answer
-            </p>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Question Review
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Review each question, your selected answer, and the correct answer
+                </p>
+              </div>
+
+              {isPreviewMode && (
+                <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700">
+                  <Lock size={14} />
+                  Preview Review
+                </span>
+              )}
+            </div>
 
             <div className="mt-6 space-y-4">
               {result.review.map((item) => (
@@ -528,19 +665,29 @@ export default function ResultPage() {
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/"
+              href="/papers"
               className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 font-semibold text-slate-700 shadow-sm"
             >
               <ArrowLeft size={16} />
-              Back Home
+              Back to Papers
             </Link>
 
             <Link
               href={`/exam/${paperId}`}
               className="inline-flex rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white"
             >
-              Retake Exam
+              {isPreviewMode ? "Retake Preview" : "Retake Exam"}
             </Link>
+
+            {isPreviewMode && (
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 rounded-2xl bg-amber-500 px-5 py-3 font-semibold text-slate-950"
+              >
+                <Crown size={16} />
+                Unlock Full Paper
+              </Link>
+            )}
           </div>
         </div>
       </Container>

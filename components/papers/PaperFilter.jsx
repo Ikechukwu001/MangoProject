@@ -34,11 +34,13 @@ export default function PaperFilter({
             className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-teal-600"
           >
             <option value="all">All subjects</option>
-            {subjects.map((subject) => (
-              <option key={subject} value={subject}>
-                {subject}
-              </option>
-            ))}
+            {subjects
+              .filter(Boolean) // remove undefined/null
+              .map((subject, index) => (
+                <option key={`${subject}-${index}`} value={subject}>
+                  {subject}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -52,11 +54,13 @@ export default function PaperFilter({
             className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-teal-600"
           >
             <option value="all">All years</option>
-            {years.map((year) => (
-              <option key={year} value={String(year)}>
-                {year}
-              </option>
-            ))}
+            {years
+              .filter(Boolean)
+              .map((year, index) => (
+                <option key={`${year}-${index}`} value={year}>
+                  {year}
+                </option>
+              ))}
           </select>
         </div>
       </div>

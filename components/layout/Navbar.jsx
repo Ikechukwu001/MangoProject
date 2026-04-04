@@ -1,27 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Menu, X, Stethoscope, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronRight, Crown, BadgeCheck, AlertCircle } from "lucide-react";
 import Container from "./Container";
+import useUserProfile from "@/src/hooks/useUserProfile";
 
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Papers", href: "/papers" },
   { name: "Pricing", href: "/pricing" },
-  { name: "About", href: "/about" },
 ];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, loading, isPremium, isPending } = useUserProfile();
 
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-
+    document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -31,20 +28,21 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
         <Container>
           <div className="flex h-20 items-center justify-between">
-            <Link
-              href="/"
-              className="flex items-center gap-3"
-              onClick={closeMenu}
-            >
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-700 to-emerald-600 text-white shadow-md shadow-teal-200">
-                <Stethoscope size={20} />
+            <Link href="/" className="flex items-center gap-3" onClick={closeMenu}>
+              <div className="relative h-11 w-11 overflow-hidden rounded-2xl">
+                <Image
+                  src="/PharmTechSuccess.png"
+                  alt="PharmTechSuccess"
+                  fill
+                  className="object-cover"
+                />
               </div>
 
-              <div className="flex flex-col">
-                <span className="text-lg font-bold tracking-tight text-slate-900">
+              <div className="flex flex-col leading-tight">
+                <span className="text-lg font-bold text-slate-900">
                   PharmTechSuccess
                 </span>
                 <span className="text-xs text-slate-500">
@@ -66,27 +64,77 @@ export default function Navbar() {
             </nav>
 
             <div className="hidden items-center gap-3 md:flex">
-              <Link
-                href="/login"
-                className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-              >
-                Login
-              </Link>
+              {loading ? (
+                <div className="rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-500">
+                  Loading...
+                </div>
+              ) : !user ? (
+                <>
+                  <Link
+                    href="/login"
+                    className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Login
+                  </Link>
 
-              <Link
-                href="/register"
-                className="rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-teal-200 transition hover:bg-teal-800"
-              >
-                Start Practicing
-              </Link>
+                  <Link
+                    href="/register"
+                    className="rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-teal-200 transition hover:bg-teal-800"
+                  >
+                    Start Practicing
+                  </Link>
+                </>
+              ) : isPremium ? (
+                <>
+                  <Link
+                    href="/papers"
+                    className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <div className="inline-flex items-center gap-2 rounded-xl bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-700">
+                    <BadgeCheck size={16} />
+                    Premium Active
+                  </div>
+                </>
+              ) : isPending ? (
+                <>
+                  <Link
+                    href="/papers"
+                    className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <div className="inline-flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700">
+                    <AlertCircle size={16} />
+                    Pending Review
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/papers"
+                    className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                  >
+                    Dashboard
+                  </Link>
+
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-amber-600"
+                  >
+                    <Crown size={16} />
+                    Upgrade
+                  </Link>
+                </>
+              )}
             </div>
 
             <button
-              type="button"
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={menuOpen}
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 md:hidden"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white md:hidden"
             >
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -95,66 +143,100 @@ export default function Navbar() {
       </header>
 
       <div
-        className={`fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-[2px] transition-all duration-300 md:hidden ${
-          menuOpen
-            ? "pointer-events-auto opacity-100"
-            : "pointer-events-none opacity-0"
+        className={`fixed inset-0 z-40 bg-black/30 transition ${
+          menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={closeMenu}
       />
 
       <div
-        className={`fixed inset-x-0 top-[80px] z-50 mx-4 origin-top rounded-3xl border border-white/60 bg-white/95 p-5 shadow-2xl shadow-slate-900/10 backdrop-blur-xl transition-all duration-300 md:hidden ${
+        className={`fixed inset-x-0 top-[80px] z-50 mx-4 rounded-3xl bg-white p-5 shadow-2xl transition ${
           menuOpen
-            ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-            : "pointer-events-none -translate-y-4 scale-95 opacity-0"
+            ? "translate-y-0 opacity-100"
+            : "-translate-y-4 pointer-events-none opacity-0"
         }`}
       >
-        <div className="mb-5 rounded-2xl bg-gradient-to-r from-teal-700 to-emerald-600 p-4 text-white">
-          <p className="text-sm font-medium text-teal-50">
-            Prepare smarter for your Pharmacy Technician CBT exams
-          </p>
-          <p className="mt-1 text-xs text-teal-100/90">
-            Practice with past questions, timed papers, and premium explanations.
-          </p>
-        </div>
-
         <nav className="flex flex-col gap-2">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               href={link.href}
               onClick={closeMenu}
-              className="group flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-teal-700"
+              className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
-              <span>{link.name}</span>
-              <ChevronRight
-                size={18}
-                className="text-slate-400 transition group-hover:translate-x-1 group-hover:text-teal-700"
-              />
+              {link.name}
+              <ChevronRight size={16} />
             </Link>
           ))}
         </nav>
 
         <div className="my-5 h-px bg-slate-200" />
 
-        <div className="flex flex-col gap-3">
-          <Link
-            href="/login"
-            onClick={closeMenu}
-            className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-          >
-            Login
-          </Link>
-
-          <Link
-            href="/register"
-            onClick={closeMenu}
-            className="rounded-2xl bg-teal-700 px-4 py-3 text-center text-sm font-semibold text-white shadow-md shadow-teal-200 transition hover:bg-teal-800"
-          >
-            Start Practicing
-          </Link>
-        </div>
+        {loading ? (
+          <div className="rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-500">
+            Loading...
+          </div>
+        ) : !user ? (
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/login"
+              onClick={closeMenu}
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Login
+            </Link>
+            <Link
+              href="/register"
+              onClick={closeMenu}
+              className="rounded-2xl bg-teal-700 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-teal-800"
+            >
+              Start Practicing
+            </Link>
+          </div>
+        ) : isPremium ? (
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/papers"
+              onClick={closeMenu}
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Dashboard
+            </Link>
+            <div className="rounded-2xl bg-teal-50 px-4 py-3 text-center text-sm font-semibold text-teal-700">
+              Premium Active
+            </div>
+          </div>
+        ) : isPending ? (
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/papers"
+              onClick={closeMenu}
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Dashboard
+            </Link>
+            <div className="rounded-2xl bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-amber-700">
+              Premium Pending
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/papers"
+              onClick={closeMenu}
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/pricing"
+              onClick={closeMenu}
+              className="rounded-2xl bg-amber-500 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-amber-600"
+            >
+              Upgrade to Premium
+            </Link>
+          </div>
+        )}
       </div>
     </>
   );

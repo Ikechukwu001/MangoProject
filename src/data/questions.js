@@ -29,6 +29,18 @@ const questions = [
     ],
   },
 
+   {
+    paperId: "anatomy-and-physiology",
+    questions: [
+      {
+        id: 1,
+        question: "What is the Muscle closest to the heart called:",
+        options: ["Myocardium", "Endocardium", "Pericardium", "Epicardium"],
+        answer: "Myocardium",
+      },
+    ],
+  },
+
   {
     paperId: "aum-sep-2021-pharmacology",
     questions: [
