@@ -117,10 +117,10 @@ export default function Footer() {
             <div className="mt-4 flex flex-col gap-3 text-sm">
               {!user ? (
                 <>
-                  <Link href="/login" className="transition hover:text-white">
+                  <Link href="/" className="transition hover:text-white">
                     Login
                   </Link>
-                  <Link href="/register" className="transition hover:text-white">
+                  <Link href="/" className="transition hover:text-white">
                     Register
                   </Link>
                 </>

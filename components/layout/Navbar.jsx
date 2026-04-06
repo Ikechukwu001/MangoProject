@@ -71,14 +71,14 @@ export default function Navbar() {
               ) : !user ? (
                 <>
                   <Link
-                    href="/login"
+                    href="/"
                     className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                   >
                     Login
                   </Link>
 
                   <Link
-                    href="/register"
+                    href="/"
                     className="rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-teal-200 transition hover:bg-teal-800"
                   >
                     Start Practicing
