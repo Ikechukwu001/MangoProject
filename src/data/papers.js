@@ -251,6 +251,42 @@ const papers = [
       "NPCE AUM Mock Examination 2025 — covering cardiovascular drugs, endocrine pharmacology, antimicrobials, analgesics, anticancer agents, and pharmacodynamics.",
     isPremium: true,
   },
+   {
+    id: "npce-pptp-2023",
+    title: "NPCE Principles of Pharmacy Technician Practice 2023",
+    subject: "Pharmacy Technician Practice",
+    year: 2023,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE August 2023 PPTP paper covering PCN, NAFDAC, pharmacy laws, technician roles, professional ethics, drug regulations and practice.",
+    isPremium: true,
+  },
+  {
+    id: "npce-pptp-resit-2024",
+    title: "NPCE PPTP Resit Examination November 2024",
+    subject: "Pharmacy Technician Practice",
+    year: 2024,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE November 2024 PPTP Resit paper covering pharmacy technician duties, PCN, NAFDAC, drug regulations, patient care, and professional conduct.",
+    isPremium: true,
+  },
+  {
+    id: "npce-pptp-2020",
+    title: "NPCE Principles of Pharmacy Technician Practice 2020",
+    subject: "Pharmacy Technician Practice",
+    year: 2020,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "Nigerian Army School 2020 PTP exam covering pharmacy history, drug laws, DDA, PPA, NAFDAC, PCN, stock control, ethics and DRFS.",
+    isPremium: true,
+  },
 ];
 
 export default papers;

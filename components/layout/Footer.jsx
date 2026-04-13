@@ -143,7 +143,9 @@ export default function Footer() {
         <div className="mt-12 h-px bg-slate-800" />
 
         <div className="mt-6 flex flex-col gap-4 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
-          <p>© 2026 PharmTechSuccess. All rights reserved.</p>
+          <p>© 2026 PharmTechSuccess. All rights reserved. Created by <a href="https://ikechukwu-portfolio.vercel.app" target="_blank" rel="noopener noreferrer" className="text-teal-400 hover:text-teal-500">
+            iKECHUKWUFRONTEND
+          </a></p>
 
           <p className="max-w-2xl leading-6 md:text-right">
             PharmTechSuccess is an independent CBT practice platform for
