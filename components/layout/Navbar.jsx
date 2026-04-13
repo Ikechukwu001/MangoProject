@@ -34,7 +34,7 @@ export default function Navbar() {
             <Link href="/" className="flex items-center gap-3" onClick={closeMenu}>
               <div className="relative h-11 w-11 overflow-hidden rounded-2xl">
                 <Image
-                  src="/PharmTechSuccess.png"
+                  src="/PharmTechSuccessMainLogo.jpg"
                   alt="PharmTechSuccess"
                   fill
                   className="object-cover"

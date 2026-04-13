@@ -64,7 +64,7 @@ export default function Footer() {
             <div className="flex items-center gap-3">
               <div className="relative h-11 w-11 overflow-hidden rounded-2xl">
                 <Image
-                  src="/PharmTechSuccess.png"
+                  src="/PharmTechSuccessMainLogo.jpg"
                   alt="PharmTechSuccess"
                   fill
                   className="object-cover"
