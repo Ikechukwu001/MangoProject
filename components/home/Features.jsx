@@ -5,214 +5,181 @@ import {
   BookOpenCheck,
   Layers3,
   Smartphone,
-  ArrowUpRight,
   Sparkles,
-  CheckCircle2,
-  Clock3,
-  ShieldCheck,
+  ArrowRight,
 } from "lucide-react";
+import Link from "next/link";
 import Container from "../layout/Container";
 
 const features = [
   {
     icon: MonitorSmartphone,
     badge: "CBT Mode",
-    title: "Real exam feel",
-    text: "Timed practice that feels close to the actual Pharmacy Technician CBT environment.",
+    title: "Practice in a real exam environment",
+    text: "Our timed CBT simulation mirrors the actual Pharmacy Technician exam interface — so when exam day comes, nothing feels new.",
     featured: true,
   },
   {
     icon: FileCheck2,
     badge: "Question Bank",
-    title: "Past papers arranged properly",
-    text: "Revise by year and paper without confusion.",
+    title: "Every past paper, perfectly organised",
+    text: "Browse and revise by year and paper with zero confusion. No hunting, no guessing — just focused practice.",
   },
   {
     icon: BarChart3,
-    badge: "Performance",
-    title: "Track your progress",
-    text: "See your score clearly after every attempt.",
+    badge: "Performance Tracking",
+    title: "Know exactly where you stand",
+    text: "Instant scores after every session. Spot your weak areas and double down before the exam.",
   },
   {
     icon: BookOpenCheck,
-    badge: "Premium Review",
-    title: "Answer explanations",
-    text: "Understand why an option is correct after submission.",
+    badge: "Deep Review",
+    title: "Understand every answer, not just the result",
+    text: "Detailed explanations for every question — so you learn the reasoning, not just the answer.",
   },
   {
     icon: Layers3,
-    badge: "Practice Style",
-    title: "Single or cumulative practice",
-    text: "Practice one paper or combine multiple papers together.",
+    badge: "Flexible Practice",
+    title: "One paper or many — you choose",
+    text: "Drill a single paper or blend multiple years into one cumulative session for broader coverage.",
   },
   {
     icon: Smartphone,
     badge: "Any Device",
-    title: "Built for mobile too",
-    text: "Practice comfortably on phone or laptop.",
+    title: "Study on your terms, on any screen",
+    text: "Fully optimised for mobile and desktop. Pick up where you left off — on the bus, at home, anywhere.",
   },
 ];
 
-const featuredStats = [
+const featuredHighlights = [
   {
-    icon: Clock3,
-    label: "Timed practice",
+    icon: MonitorSmartphone,
+    label: "Timed CBT simulation",
+    sub: "Mirrors the real exam interface",
   },
   {
-    icon: CheckCircle2,
-    label: "Past questions",
+    icon: BarChart3,
+    label: "Live score tracking",
+    sub: "Know where you stand instantly",
   },
   {
-    icon: ShieldCheck,
-    label: "Exam-focused flow",
+    icon: BookOpenCheck,
+    label: "Answer explanations",
+    sub: "Learn the why, not just the what",
   },
 ];
 
 export default function Features() {
-  const featured = features.find((item) => item.featured);
-  const others = features.filter((item) => !item.featured);
+  const featured = features.find((f) => f.featured);
+  const others = features.filter((f) => !f.featured);
 
   return (
-    <section className="relative overflow-hidden bg-[#f8fbfc] py-16 sm:py-20 lg:py-24">
-      <div className="absolute inset-0 -z-30 bg-[linear-gradient(to_bottom,_#f8fbfc,_#ffffff_36%,_#f8fafc)]" />
-      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top_left,_rgba(13,148,136,0.10),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(14,165,233,0.08),_transparent_24%)]" />
-      <div className="absolute left-[10%] top-16 -z-10 h-40 w-40 rounded-full bg-teal-200/40 blur-3xl" />
-      <div className="absolute right-[8%] bottom-10 -z-10 h-44 w-44 rounded-full bg-sky-200/30 blur-3xl" />
-
+    <section className="relative overflow-hidden py-20 sm:py-24 lg:py-32">
       <Container>
-        <div className="mx-auto max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-teal-200/80 bg-white/90 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-teal-700 shadow-[0_10px_30px_rgba(15,23,42,0.05)] backdrop-blur sm:text-xs">
-            <Sparkles size={14} />
-            Why PharmTechSuccess
+
+        {/* Header */}
+        <div className="mx-auto max-w-2xl text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-teal-700">
+            <Sparkles size={12} />
+            Built for Pharmacy Technician Students
           </div>
 
-          <h2 className="mx-auto mt-5 max-w-4xl text-[2rem] font-bold leading-[1.05] tracking-[-0.04em] text-slate-950 sm:text-4xl lg:text-5xl">
-            Everything you need to prepare smarter
+          <h2 className="mt-5 text-[1.9rem] font-bold leading-[1.1] tracking-[-0.03em] text-slate-900 sm:text-4xl lg:text-[3.2rem]">
+            The smarter way to pass your{" "}
+            <span className="text-teal-600">Pharmacy Technician exam</span>
           </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-7 text-slate-600 sm:text-base sm:leading-8 lg:text-lg">
-            A clean and focused CBT practice experience built to help Pharmacy
-            Technician students prepare with confidence.
+          <p className="mt-4 text-base leading-7 text-slate-500 sm:text-lg sm:leading-8">
+            PharmTechSuccess gives you structured CBT practice, real past questions,
+            and the performance insights you need — all in one focused platform.
           </p>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-4 lg:mt-12 lg:grid-cols-12 lg:gap-5">
-          {/* Featured card */}
-          <div className="lg:col-span-7">
-            <div className="group relative h-full overflow-hidden rounded-[32px] border border-slate-200/80 bg-white/95 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.06)] ring-1 ring-white/70 transition duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_24px_55px_rgba(15,23,42,0.10)] sm:p-6 lg:p-7">
-              <div className="absolute right-0 top-0 h-32 w-32 rounded-full bg-teal-100/50 blur-3xl transition duration-300 group-hover:bg-teal-200/60" />
-              <div className="absolute bottom-0 left-0 h-28 w-28 rounded-full bg-sky-100/40 blur-3xl" />
+        {/* Featured card */}
+        <div className="mt-14 lg:mt-16">
+          <div className="group relative overflow-hidden rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_8px_40px_rgba(15,23,42,0.07)] transition duration-300 hover:border-teal-200 hover:shadow-[0_16px_56px_rgba(15,23,42,0.11)] sm:p-8 lg:p-10">
 
-              <div className="relative flex items-start justify-between gap-4">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[22px] border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-cyan-50 text-teal-700 shadow-sm transition duration-300 group-hover:bg-teal-700 group-hover:text-white">
-                  <featured.icon size={28} />
-                </div>
+            <div className="pointer-events-none absolute inset-0 rounded-[28px] opacity-0 ring-1 ring-inset ring-teal-300/30 transition duration-300 group-hover:opacity-100" />
 
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 transition duration-300 group-hover:border-teal-200 group-hover:text-teal-700">
-                  <ArrowUpRight size={18} />
-                </div>
-              </div>
+            <div className="grid gap-8 lg:grid-cols-2 lg:gap-16 lg:items-center">
 
-              <div className="relative mt-6">
-                <div className="inline-flex rounded-full bg-teal-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-teal-700 sm:text-[11px]">
+              {/* Left — copy */}
+              <div>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-teal-100 bg-teal-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-teal-600">
                   {featured.badge}
-                </div>
+                </span>
 
-                <h3 className="mt-4 max-w-[14ch] text-2xl font-semibold tracking-[-0.03em] text-slate-950 sm:text-[2rem] sm:leading-[1.05]">
+                <h3 className="mt-4 text-2xl font-bold tracking-[-0.03em] text-slate-900 sm:text-3xl lg:text-[2.1rem] lg:leading-[1.1]">
                   {featured.title}
                 </h3>
 
-                <p className="mt-4 max-w-[40ch] text-sm leading-7 text-slate-600 sm:text-[15px]">
+                <p className="mt-4 text-[15px] leading-7 text-slate-500 sm:text-base sm:leading-8">
                   {featured.text}
                 </p>
+
+                <Link
+                  href="#"
+                  className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-teal-600 transition hover:text-teal-700"
+                >
+                  Start practising free <ArrowRight size={15} />
+                </Link>
               </div>
 
-              <div className="relative mt-7 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                {featuredStats.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <div
-                      key={item.label}
-                      className="rounded-[22px] border border-slate-200/80 bg-slate-50/80 px-4 py-4"
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-teal-700 shadow-sm ring-1 ring-slate-200">
-                        <Icon size={18} />
-                      </div>
-                      <p className="mt-3 text-sm font-semibold text-slate-900">
-                        {item.label}
-                      </p>
+              {/* Right — icon strip */}
+              <div className="flex flex-col gap-6 border-l border-slate-100 pl-8 lg:pl-12">
+                {featuredHighlights.map(({ icon: Icon, label, sub }) => (
+                  <div key={label} className="flex items-start gap-4">
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-teal-100 bg-teal-50 text-teal-600 transition duration-300 group-hover:bg-teal-600 group-hover:text-white group-hover:border-teal-600">
+                      <Icon size={18} />
                     </div>
-                  );
-                })}
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">{label}</p>
+                      <p className="mt-0.5 text-sm text-slate-500">{sub}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <div className="relative mt-7 grid grid-cols-1 gap-3 min-[430px]:grid-cols-3">
-                <div className="rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-sm">
-                  <p className="text-lg font-bold text-slate-950">CBT</p>
-                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    Exam Style
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-sm">
-                  <p className="text-lg font-bold text-slate-950">Easy</p>
-                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    To Navigate
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200/80 bg-white px-4 py-3 shadow-sm">
-                  <p className="text-lg font-bold text-slate-950">Better</p>
-                  <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                    Preparation
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
+        </div>
 
-          {/* Smaller cards */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-2">
-            {others.map((feature) => {
-              const Icon = feature.icon;
+        {/* Feature rows */}
+        <div className="mt-10 divide-y divide-slate-100">
+          {others.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <div
+                key={feature.title}
+                className="group flex items-start gap-5 py-7 sm:gap-7 sm:py-8"
+              >
+                <div className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 transition duration-200 group-hover:border-teal-200 group-hover:bg-teal-50 group-hover:text-teal-600">
+                  <Icon size={20} />
+                </div>
 
-              return (
-                <div
-                  key={feature.title}
-                  className="group relative min-w-0 overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/95 p-5 shadow-[0_14px_36px_rgba(15,23,42,0.05)] ring-1 ring-white/70 transition duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-[0_22px_50px_rgba(15,23,42,0.10)] sm:p-5"
-                >
-                  <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-teal-100/40 blur-2xl transition duration-300 group-hover:bg-teal-200/50" />
-
-                  <div className="relative flex items-start justify-between gap-4">
-                    <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-[18px] border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-cyan-50 text-teal-700 shadow-sm transition duration-300 group-hover:bg-teal-700 group-hover:text-white">
-                      <Icon size={22} />
-                    </div>
-
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-400 transition duration-300 group-hover:border-teal-200 group-hover:text-teal-700">
-                      <ArrowUpRight size={15} />
-                    </div>
-                  </div>
-
-                  <div className="relative mt-5">
-                    <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-600">
-                      {feature.badge}
-                    </div>
-
-                    <h3 className="mt-4 max-w-[15ch] text-base font-semibold tracking-[-0.02em] text-slate-950 sm:text-lg">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h3 className="text-base font-semibold tracking-[-0.02em] text-slate-900 sm:text-lg">
                       {feature.title}
                     </h3>
-
-                    <p className="mt-3 text-sm leading-7 text-slate-600">
-                      {feature.text}
-                    </p>
+                    <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                      {feature.badge}
+                    </span>
                   </div>
-
-                  <div className="relative mt-5 h-px w-full bg-gradient-to-r from-teal-200/80 via-slate-200 to-transparent" />
+                  <p className="mt-1.5 text-sm leading-6 text-slate-500 sm:text-[15px] sm:leading-7">
+                    {feature.text}
+                  </p>
                 </div>
-              );
-            })}
-          </div>
+
+                <ArrowRight
+                  size={16}
+                  className="mt-1.5 shrink-0 text-slate-300 transition duration-200 group-hover:text-teal-500"
+                />
+              </div>
+            );
+          })}
         </div>
+
       </Container>
     </section>
   );

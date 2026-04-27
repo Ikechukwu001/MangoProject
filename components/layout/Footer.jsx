@@ -103,7 +103,7 @@ export default function Footer() {
               <Link href="/pricing" className="transition hover:text-white">
                 Pricing
               </Link>
-              <Link href="/about" className="transition hover:text-white">
+              <Link href="/" className="transition hover:text-white">
                 About
               </Link>
             </div>
