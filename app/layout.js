@@ -66,7 +66,7 @@ export const metadata = {
     siteName,
     title: "PharmTechSuccess — Pass the National PreCertification Examination",
     description:
-      "Practice real CBT past questions, take timed mock exams, and track your performance. Built specifically for Nigerian Pharmacy Technician students.",
+      "Practice real CBT past questions, take timed mock exams, and track your performance. Built specifically for Nigerian Pharmacy Technician students.Built my iKECHUKWUFRONTEND",
     images: [
       {
         url: "/og-image.jpg",

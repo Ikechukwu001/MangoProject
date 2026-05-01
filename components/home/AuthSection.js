@@ -111,7 +111,7 @@ export default function AuthSection() {
               margin: "0 0 1.25rem",
               letterSpacing: "-0.02em",
             }}>
-              Your pharmacy technician PCNE<br />
+              Your Pharmacy Technician PCNE<br />
               <span style={{ color: "#14b8a6" }}>edge starts here.</span>
             </h1>
 
@@ -120,8 +120,8 @@ export default function AuthSection() {
             </p>
 
             <div style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(0,0,0,0.08)",
+              background: "#ffffff",
+              border: "2px solid rgba(0,0,0,0.08)",
               borderRadius: 24,
               padding: "2rem",
               display: "flex",
@@ -132,7 +132,7 @@ export default function AuthSection() {
                 <Lottie animationData={accessAnimation} loop />
               </div>
               {!currentUser ? (
-                <p style={{ marginTop: 12, fontSize: 13, color: "#94a3b8", textAlign: "center" }}>
+                <p style={{ marginTop: 12, fontSize: 13, color: "#8f8f8f", textAlign: "center" }}>
                   Sign up and start in under 60 seconds
                 </p>
               ) : (
