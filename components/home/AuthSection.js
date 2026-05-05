@@ -10,7 +10,7 @@ import { createClient } from "@/src/lib/supabase/client";
 import accessAnimation from "@/public/lottie/Email.json";
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://pharmtechsuccess.study";
+  process.env.NEXT_PUBLIC_APP_URL || "https://pharmtechsuccess.study";
 
 export default function AuthSection() {
   const supabase = createClient();
@@ -67,27 +67,30 @@ export default function AuthSection() {
     setMessageType("default");
   };
 
-  const handleGoogleSignIn = async () => {
-    resetMessage();
-    setGoogleLoading(true);
+ const handleGoogleSignIn = async () => {
+  resetMessage();
+  setGoogleLoading(true);
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${SITE_URL}/auth/callback?next=/papers`,
-        queryParams: {
-          access_type: "offline",
-          prompt: "consent",
-        },
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${SITE_URL}/auth/callback?next=/papers`,
+      queryParams: {
+        access_type: "offline",
+        prompt: "consent",
       },
-    });
+    },
+  });
 
-    if (error) {
-      setMessage(error.message);
-      setMessageType("error");
-      setGoogleLoading(false);
-    }
-  };
+  if (error) {
+    console.error("Google sign in error:", error);
+    setMessage(
+      error.message || "Google sign in failed. Check Supabase redirect URLs."
+    );
+    setMessageType("error");
+    setGoogleLoading(false);
+  }
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
