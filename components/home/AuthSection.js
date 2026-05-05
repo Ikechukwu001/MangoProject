@@ -9,6 +9,9 @@ import { FcGoogle } from "react-icons/fc";
 import { createClient } from "@/src/lib/supabase/client";
 import accessAnimation from "@/public/lottie/Email.json";
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || "https://pharmtechsuccess.study";
+
 export default function AuthSection() {
   const supabase = createClient();
   const router = useRouter();
@@ -23,7 +26,6 @@ export default function AuthSection() {
 
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("default");
 
@@ -48,36 +50,44 @@ export default function AuthSection() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setCurrentUser(session?.user ?? null);
       setCheckingUser(false);
+
+      if (session?.user) {
+        router.refresh();
+      }
     });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [supabase, router]);
 
   const resetMessage = () => {
     setMessage("");
     setMessageType("default");
   };
 
-const handleGoogleSignIn = async () => {
-  resetMessage();
-  setGoogleLoading(true);
+  const handleGoogleSignIn = async () => {
+    resetMessage();
+    setGoogleLoading(true);
 
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${window.location.origin}/auth/callback?next=/papers`,
-    },
-  });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${SITE_URL}/auth/callback?next=/papers`,
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
+    });
 
-  if (error) {
-    setMessage(error.message);
-    setMessageType("error");
-    setGoogleLoading(false);
-  }
-};
+    if (error) {
+      setMessage(error.message);
+      setMessageType("error");
+      setGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -89,7 +99,7 @@ const handleGoogleSignIn = async () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/papers`,
+          emailRedirectTo: `${SITE_URL}/auth/callback?next=/papers`,
           data: {
             full_name: fullName,
           },
@@ -105,6 +115,7 @@ const handleGoogleSignIn = async () => {
 
       if (data?.session) {
         router.push("/papers");
+        router.refresh();
         return;
       }
 
