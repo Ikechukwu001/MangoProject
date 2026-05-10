@@ -20,7 +20,7 @@ import {
 import Container from "@/components/layout/Container";
 import { createClient } from "@/src/lib/supabase/client";
 
-const PREMIUM_PRICE = 5000;
+const PREMIUM_PRICE = 3000;
 
 const PAYMENT_DETAILS = {
   bankName: "Opay",

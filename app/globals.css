@@ -133,3 +133,8 @@
     background: color-mix(in oklab, var(--primary) 28%, white);
   }
 }
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+}

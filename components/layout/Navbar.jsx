@@ -43,7 +43,7 @@ export default function Navbar() {
 
               <div className="flex flex-col leading-tight">
                 <span className="text-lg font-bold text-slate-900">
-                  PharmTechSuccess
+                  PharmTechSuccess.
                 </span>
                 <span className="text-xs text-slate-500">
                   CBT Practice Platform

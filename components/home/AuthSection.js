@@ -150,6 +150,7 @@ export default function AuthSection() {
 
   return (
     <section
+     id="auth-section" className="scroll-mt-24"
       style={{
         minHeight: "100vh",
         display: "flex",

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   ArrowRight,
   CheckCircle2,
@@ -64,7 +63,6 @@ export default function Hero() {
 
       <Container className="py-12 sm:py-16 lg:py-24">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 xl:gap-14">
-          {/* LEFT */}
           <div className="min-w-0">
             <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-teal-200/80 bg-white/90 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-teal-700 shadow-[0_12px_30px_rgba(15,23,42,0.06)] backdrop-blur sm:px-4 sm:text-xs">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-600 text-white">
@@ -88,6 +86,7 @@ export default function Hero() {
             <div className="mt-6 grid grid-cols-1 gap-3 xs:grid-cols-2 sm:flex sm:flex-wrap">
               {trustItems.map((item) => {
                 const Icon = item.icon;
+
                 return (
                   <div
                     key={item.label}
@@ -103,7 +102,7 @@ export default function Hero() {
             </div>
 
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link
+              <a
                 href="#auth-section"
                 className="group inline-flex min-h-[54px] w-full items-center justify-center gap-2 rounded-2xl border border-teal-700 bg-teal-700 px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(13,148,136,0.28)] transition duration-300 hover:-translate-y-0.5 hover:bg-teal-800 sm:w-auto"
               >
@@ -112,14 +111,14 @@ export default function Hero() {
                   size={18}
                   className="transition duration-300 group-hover:translate-x-1"
                 />
-              </Link>
+              </a>
 
-              <Link
-                href="/papers"
+              <a
+                href="#auth-section"
                 className="inline-flex min-h-[54px] w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-semibold text-slate-700 shadow-[0_10px_25px_rgba(15,23,42,0.05)] transition duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 sm:w-auto"
               >
                 Explore Papers
-              </Link>
+              </a>
             </div>
 
             <div className="mt-8 grid grid-cols-1 gap-3 min-[420px]:grid-cols-3">
@@ -141,6 +140,7 @@ export default function Hero() {
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {metricCards.map((item) => {
                 const Icon = item.icon;
+
                 return (
                   <div
                     key={item.title}
@@ -166,10 +166,8 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* RIGHT */}
           <div className="min-w-0">
             <div className="relative mx-auto w-full max-w-[620px]">
-              {/* floating badges kept inside mobile safe zone */}
               <div className="absolute left-3 top-3 z-20 rounded-2xl border border-white/80 bg-white/90 px-3 py-2 shadow-[0_14px_30px_rgba(15,23,42,0.08)] backdrop-blur sm:left-[-14px] sm:top-8 sm:px-4 sm:py-3">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 sm:text-xs">
                   CBT Mode
@@ -215,7 +213,6 @@ export default function Hero() {
                     </div>
                   </div>
 
-                  {/* mobile-first grid */}
                   <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1.15fr_0.85fr]">
                     <div className="min-w-0 rounded-[24px] border border-slate-200 bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.05)] sm:p-5">
                       <div className="flex flex-col gap-3 min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
@@ -253,7 +250,6 @@ export default function Hero() {
                       </div>
                     </div>
 
-                    {/* mobile grid for side cards */}
                     <div className="grid grid-cols-1 gap-3 min-[430px]:grid-cols-2 lg:grid-cols-1">
                       <div className="rounded-[22px] border border-slate-200 bg-white p-4 shadow-sm">
                         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -288,7 +284,10 @@ export default function Hero() {
                           Premium
                         </div>
                         <div className="mt-3 inline-flex items-start gap-2 text-sm text-slate-700">
-                          <BadgeCheck size={15} className="mt-0.5 shrink-0 text-teal-700" />
+                          <BadgeCheck
+                            size={15}
+                            className="mt-0.5 shrink-0 text-teal-700"
+                          />
                           <span>Explanations after submission</span>
                         </div>
                       </div>

@@ -84,6 +84,17 @@ export default function ResultPage() {
     }
   }, [paperId]);
 
+  // Load Cormorant Garamond for the result slip
+  useEffect(() => {
+    const id = "cormorant-font";
+    if (document.getElementById(id)) return;
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap";
+    document.head.appendChild(link);
+  }, []);
+
   const formatTimeUsed = (seconds) => {
     const mins = Math.floor((seconds || 0) / 60);
     const secs = (seconds || 0) % 60;
@@ -111,315 +122,620 @@ export default function ResultPage() {
     : "N/A";
 
   const handlePrintSlip = () => {
-    const printContents = slipRef.current?.innerHTML;
-    if (!printContents) return;
+    const accentColor = passed ? "#0f766e" : "#b91c1c";
+    const accentLight = passed ? "#ccfbf1" : "#fee2e2";
+    const accentMid = passed ? "#0d9488" : "#dc2626";
+    const statusWord = passed ? "PASS" : "FAIL";
+    const pct = result?.percentage || 0;
+    const barWidth = pct;
 
-    const printWindow = window.open("", "_blank", "width=1000,height=800");
+    const printWindow = window.open("", "_blank", "width=1100,height=900");
     if (!printWindow) return;
 
     printWindow.document.open();
     printWindow.document.write(`
-      <html>
-        <head>
-          <title>PharmTechSuccess Premium Result Slip</title>
-          <style>
-            * {
-              box-sizing: border-box;
-            }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PharmTechSuccess — Official CBT Result Certificate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-            body {
-              margin: 0;
-              padding: 24px;
-              background: #f1f5f9;
-              color: #0f172a;
-              font-family: Inter, Arial, Helvetica, sans-serif;
-            }
+    :root {
+      --accent: ${accentColor};
+      --accent-light: ${accentLight};
+      --accent-mid: ${accentMid};
+      --ink: #1a1a2e;
+      --ink-2: #374151;
+      --ink-3: #6b7280;
+      --rule: #d4c5a9;
+      --paper: #fffef9;
+      --paper-2: #faf8f2;
+      --border: #e8e0d0;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+    }
 
-            .print-shell {
-              max-width: 980px;
-              margin: 0 auto;
-            }
+    @page {
+      size: A4;
+      margin: 0;
+    }
 
-            .slip {
-              background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-              border: 1px solid #dbeafe;
-              border-radius: 28px;
-              overflow: hidden;
-              box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
-            }
+    html, body {
+      width: 210mm;
+      min-height: 297mm;
+      background: #e8e3d8;
+      font-family: var(--sans);
+      color: var(--ink);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
-            .hero {
-              padding: 30px 30px 24px;
-              background:
-                radial-gradient(circle at top right, rgba(20,184,166,0.12), transparent 28%),
-                radial-gradient(circle at top left, rgba(59,130,246,0.10), transparent 30%),
-                linear-gradient(135deg, #0f172a 0%, #111827 45%, #0f766e 100%);
-              color: #ffffff;
-            }
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: var(--paper);
+      position: relative;
+      overflow: hidden;
+    }
 
-            .brandline {
-              font-size: 11px;
-              font-weight: 800;
-              letter-spacing: 0.22em;
-              text-transform: uppercase;
-              color: #99f6e4;
-              margin-bottom: 10px;
-            }
+    /* ── Decorative corner ornaments ── */
+    .corner {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+    }
+    .corner-tl { top: 18px; left: 18px; border-top: 2.5px solid var(--accent); border-left: 2.5px solid var(--accent); border-radius: 4px 0 0 0; }
+    .corner-tr { top: 18px; right: 18px; border-top: 2.5px solid var(--accent); border-right: 2.5px solid var(--accent); border-radius: 0 4px 0 0; }
+    .corner-bl { bottom: 18px; left: 18px; border-bottom: 2.5px solid var(--accent); border-left: 2.5px solid var(--accent); border-radius: 0 0 0 4px; }
+    .corner-br { bottom: 18px; right: 18px; border-bottom: 2.5px solid var(--accent); border-right: 2.5px solid var(--accent); border-radius: 0 0 4px 0; }
 
-            .title {
-              margin: 0;
-              font-size: 30px;
-              font-weight: 800;
-              line-height: 1.15;
-            }
+    /* ── Outer border rule ── */
+    .page-border {
+      position: absolute;
+      inset: 10px;
+      border: 1px solid var(--rule);
+      pointer-events: none;
+    }
 
-            .subtitle {
-              margin-top: 10px;
-              font-size: 14px;
-              line-height: 1.7;
-              color: rgba(255,255,255,0.82);
-            }
+    /* ── Background watermark ── */
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      font-family: var(--serif);
+      font-size: 110px;
+      font-weight: 700;
+      color: ${passed ? "rgba(13,148,136,0.045)" : "rgba(185,28,28,0.045)"};
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+    }
 
-            .hero-row {
-              margin-top: 20px;
-              display: flex;
-              flex-wrap: wrap;
-              gap: 10px;
-            }
+    /* ── Header band ── */
+    .header-band {
+      background: var(--ink);
+      padding: 0 40px;
+      height: 7px;
+    }
+    .header-accent-line {
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
+    }
 
-            .hero-badge {
-              display: inline-flex;
-              align-items: center;
-              padding: 10px 16px;
-              border-radius: 999px;
-              font-size: 12px;
-              font-weight: 700;
-              border: 1px solid rgba(255,255,255,0.14);
-              background: rgba(255,255,255,0.08);
-              color: #ffffff;
-            }
+    /* ── Main content ── */
+    .content {
+      padding: 32px 44px 28px;
+      position: relative;
+    }
 
-            .body {
-              padding: 28px;
-            }
+    /* ── Masthead ── */
+    .masthead {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+    }
 
-            .score-panel {
-              display: grid;
-              grid-template-columns: 1.15fr 0.85fr;
-              gap: 16px;
-              margin-bottom: 18px;
-            }
+    .brand-block {}
+    .brand-eyebrow {
+      font-family: var(--sans);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .brand-name {
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.1;
+    }
+    .brand-sub {
+      font-family: var(--sans);
+      font-size: 10.5px;
+      color: var(--ink-3);
+      margin-top: 4px;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
 
-            .score-main,
-            .score-side {
-              border: 1px solid #e2e8f0;
-              border-radius: 22px;
-              background: #ffffff;
-              padding: 22px;
-            }
+    .status-medallion {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      border: 3px solid ${accentColor};
+      background: ${accentLight};
+      flex-shrink: 0;
+    }
+    .medallion-word {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      color: ${accentColor};
+      line-height: 1;
+    }
+    .medallion-sub {
+      font-family: var(--sans);
+      font-size: 7.5px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: ${accentColor};
+      margin-top: 3px;
+      opacity: 0.8;
+    }
 
-            .mini-label {
-              font-size: 11px;
-              font-weight: 700;
-              letter-spacing: 0.14em;
-              text-transform: uppercase;
-              color: #64748b;
-            }
+    /* ── Document title zone ── */
+    .doc-title-zone {
+      text-align: center;
+      padding: 20px 0 16px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .doc-title-eyebrow {
+      font-family: var(--sans);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 8px;
+    }
+    .doc-title {
+      font-family: var(--serif);
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+      line-height: 1.15;
+    }
+    .doc-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .doc-ornament {
+      margin: 10px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--rule);
+    }
+    .doc-ornament-line { flex: 1; max-width: 60px; height: 1px; background: var(--rule); }
+    .doc-ornament-diamond {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
 
-            .big-score {
-              margin-top: 12px;
-              font-size: 52px;
-              line-height: 1;
-              font-weight: 800;
-              color: #0f172a;
-            }
+    /* ── Score hero ── */
+    .score-hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 18px 0;
+    }
 
-            .score-sub {
-              margin-top: 8px;
-              font-size: 15px;
-              color: #475569;
-            }
+    .score-main-block {
+      background: var(--paper-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    .score-main-block::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: var(--accent);
+      border-radius: 4px 0 0 4px;
+    }
+    .score-eyebrow {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 6px;
+    }
+    .score-number {
+      font-family: var(--serif);
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .score-number span {
+      font-size: 36px;
+      color: var(--ink-3);
+    }
+    .score-fraction {
+      font-size: 13px;
+      color: var(--ink-3);
+      margin-top: 4px;
+      font-weight: 400;
+    }
 
-            .progress-wrap {
-              margin-top: 18px;
-            }
+    .progress-outer {
+      margin-top: 14px;
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-inner {
+      height: 100%;
+      width: ${barWidth}%;
+      background: linear-gradient(90deg, var(--accent-mid), var(--accent));
+      border-radius: 99px;
+    }
 
-            .progress-track {
-              width: 100%;
-              height: 14px;
-              border-radius: 999px;
-              background: #e2e8f0;
-              overflow: hidden;
-            }
+    .score-right-block {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .stat-pill {
+      flex: 1;
+      background: var(--paper-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stat-pill-label {
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+    .stat-pill-value {
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+    }
 
-            .progress-fill {
-              height: 100%;
-              border-radius: 999px;
-              background: ${passed ? "#0f766e" : "#dc2626"};
-              width: ${result?.percentage || 0}%;
-            }
+    /* ── Horizontal rule with diamond ── */
+    .hr-diamond {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0 16px;
+    }
+    .hr-diamond-line { flex: 1; height: 1px; background: var(--border); }
+    .hr-diamond-shape {
+      width: 7px; height: 7px;
+      border: 1.5px solid var(--accent);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
 
-            .status-badge {
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-              width: 100%;
-              padding: 18px 16px;
-              border-radius: 20px;
-              font-size: 22px;
-              font-weight: 800;
-              background: ${passed ? "#dcfce7" : "#fee2e2"};
-              color: ${passed ? "#166534" : "#991b1b"};
-              margin-top: 18px;
-            }
+    /* ── Performance label ── */
+    .perf-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--accent-light);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 12px 18px;
+      margin-bottom: 16px;
+    }
+    .perf-label-left {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .perf-label-right {
+      font-family: var(--serif);
+      font-size: 17px;
+      font-weight: 700;
+      color: ${accentColor};
+      letter-spacing: 0.01em;
+    }
 
-            .status-note {
-              margin-top: 14px;
-              font-size: 14px;
-              line-height: 1.7;
-              color: #475569;
-            }
+    /* ── Details table ── */
+    .details-section-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 10px;
+    }
 
-            .metrics {
-              display: grid;
-              grid-template-columns: repeat(2, minmax(0, 1fr));
-              gap: 14px;
-              margin-top: 18px;
-              margin-bottom: 18px;
-            }
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .details-table tr {
+      border-bottom: 1px solid var(--border);
+    }
+    .details-table tr:last-child {
+      border-bottom: none;
+    }
+    .details-table td {
+      padding: 9px 0;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .details-table td:first-child {
+      font-weight: 600;
+      color: var(--ink-3);
+      width: 42%;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .details-table td:last-child {
+      font-weight: 500;
+      color: var(--ink);
+    }
 
-            .metric {
-              border: 1px solid #e2e8f0;
-              background: #f8fafc;
-              border-radius: 18px;
-              padding: 16px;
-            }
+    /* ── Official note ── */
+    .official-note {
+      margin-top: 16px;
+      padding: 13px 16px;
+      background: var(--paper-2);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+    }
+    .official-note-title {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
+    .official-note p {
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--ink-3);
+    }
 
-            .metric-label {
-              font-size: 11px;
-              font-weight: 700;
-              letter-spacing: 0.12em;
-              text-transform: uppercase;
-              color: #64748b;
-            }
+    /* ── Footer ── */
+    .doc-footer {
+      margin-top: 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .footer-left {
+      font-size: 9.5px;
+      color: var(--ink-3);
+      font-weight: 400;
+    }
+    .footer-left strong { font-weight: 600; color: var(--ink-2); }
+    .footer-ref {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      background: var(--paper-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 5px 10px;
+    }
+    .footer-brand {
+      font-family: var(--serif);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.01em;
+    }
 
-            .metric-value {
-              margin-top: 10px;
-              font-size: 24px;
-              font-weight: 800;
-              color: #0f172a;
-            }
+    /* ── Bottom band ── */
+    .bottom-band {
+      height: 7px;
+      background: var(--ink);
+    }
+    .bottom-accent-line {
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--accent) 100%);
+    }
 
-            .details-grid {
-              display: grid;
-              grid-template-columns: repeat(2, minmax(0, 1fr));
-              gap: 14px;
-              margin-top: 6px;
-            }
+    @media print {
+      html, body { background: white; width: 100%; }
+      .page { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="page-border"></div>
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+    <div class="watermark">${statusWord}</div>
 
-            .detail-card {
-              border: 1px solid #e2e8f0;
-              border-radius: 18px;
-              padding: 16px;
-              background: #ffffff;
-            }
+    <div class="header-band"></div>
+    <div class="header-accent-line"></div>
 
-            .detail-card.wide {
-              grid-column: span 2;
-            }
+    <div class="content">
 
-            .detail-label {
-              font-size: 11px;
-              font-weight: 700;
-              letter-spacing: 0.12em;
-              text-transform: uppercase;
-              color: #64748b;
-            }
+      <!-- Masthead -->
+      <div class="masthead">
+        <div class="brand-block">
+          <div class="brand-eyebrow">Official Performance Certificate</div>
+          <div class="brand-name">PharmTech<em style="font-style:italic;color:var(--accent)">Success</em></div>
+          <div class="brand-sub">Pharmacy Technician Computer-Based Test Platform</div>
+        </div>
+        <div class="status-medallion">
+          <div class="medallion-word">${statusWord}</div>
+          <div class="medallion-sub">${passed ? "Passed" : "Failed"}</div>
+        </div>
+      </div>
 
-            .detail-value {
-              margin-top: 10px;
-              font-size: 15px;
-              font-weight: 700;
-              line-height: 1.7;
-              color: #0f172a;
-            }
+      <!-- Document title -->
+      <div class="doc-title-zone">
+        <div class="doc-title-eyebrow">CBT Performance Result Sheet</div>
+        <div class="doc-title">${result?.paperTitle || "Pharmacy Technician CBT"}</div>
+        <div class="doc-ornament">
+          <div class="doc-ornament-line"></div>
+          <div class="doc-ornament-diamond"></div>
+          <div class="doc-ornament-line"></div>
+        </div>
+      </div>
 
-            .note-box {
-              margin-top: 18px;
-              padding: 16px 18px;
-              border-radius: 18px;
-              border: 1px dashed #cbd5e1;
-              background: #f8fafc;
-              font-size: 13px;
-              line-height: 1.8;
-              color: #475569;
-            }
-
-            .footer {
-              margin-top: 20px;
-              padding-top: 18px;
-              border-top: 1px dashed #cbd5e1;
-              display: flex;
-              justify-content: space-between;
-              gap: 16px;
-              flex-wrap: wrap;
-              font-size: 12px;
-              color: #64748b;
-            }
-
-            @media print {
-              body {
-                padding: 0;
-                background: #ffffff;
-              }
-
-              .print-shell {
-                max-width: 100%;
-              }
-
-              .slip {
-                box-shadow: none;
-                border-radius: 0;
-                border: none;
-              }
-            }
-
-            @media (max-width: 700px) {
-              .score-panel,
-              .details-grid,
-              .metrics {
-                grid-template-columns: 1fr;
-              }
-
-              .detail-card.wide {
-                grid-column: span 1;
-              }
-
-              .hero,
-              .body {
-                padding: 20px;
-              }
-
-              .big-score {
-                font-size: 40px;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="print-shell">
-            ${printContents}
+      <!-- Score hero -->
+      <div class="score-hero">
+        <div class="score-main-block">
+          <div class="score-eyebrow">Overall Score</div>
+          <div class="score-number">${pct}<span>%</span></div>
+          <div class="score-fraction">${result?.score} correct out of ${result?.totalQuestions} questions</div>
+          <div class="progress-outer">
+            <div class="progress-inner"></div>
           </div>
-          <script>
-            window.onload = function () {
-              window.print();
-              window.onafterprint = function () {
-                window.close();
-              };
-            };
-          </script>
-        </body>
-      </html>
+        </div>
+
+        <div class="score-right-block">
+          <div class="stat-pill">
+            <div class="stat-pill-label">Correct</div>
+            <div class="stat-pill-value">${result?.score}</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-label">Wrong</div>
+            <div class="stat-pill-value">${result ? Math.max(result.answeredCount - result.score, 0) : 0}</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-label">Unanswered</div>
+            <div class="stat-pill-value">${result?.unansweredCount ?? 0}</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-label">Time Used</div>
+            <div class="stat-pill-value" style="font-size:16px;">${formatTimeUsed(result?.timeUsed)}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance label -->
+      <div class="hr-diamond">
+        <div class="hr-diamond-line"></div>
+        <div class="hr-diamond-shape"></div>
+        <div class="hr-diamond-line"></div>
+      </div>
+
+      <div class="perf-label-row">
+        <div class="perf-label-left">Performance Assessment</div>
+        <div class="perf-label-right">${passed ? (pct >= 80 ? "Excellent Performance" : pct >= 60 ? "Very Good Performance" : "Good Performance") : (pct >= 40 ? "Fair Performance" : "Needs Improvement")}</div>
+      </div>
+
+      <!-- Details table -->
+      <div class="details-section-title">Examination Details</div>
+      <table class="details-table">
+        <tr>
+          <td>Exam Paper</td>
+          <td>${result?.paperTitle || "—"}</td>
+        </tr>
+        <tr>
+          <td>Submission Type</td>
+          <td>${result?.autoSubmitted ? "Auto Submitted (Time Expired)" : "Manual Submission"}</td>
+        </tr>
+        <tr>
+          <td>Submitted At</td>
+          <td>${result?.submittedAt ? new Date(result.submittedAt).toLocaleString() : "N/A"}</td>
+        </tr>
+        <tr>
+          <td>Pass Benchmark</td>
+          <td>50% (${50} marks required)</td>
+        </tr>
+        <tr>
+          <td>Question Scope</td>
+          <td>${result?.previewMode ? `${result?.totalQuestions} preview questions of ${result?.fullPaperQuestions || result?.totalQuestions} total` : `${result?.totalQuestions} questions (Full Paper)`}</td>
+        </tr>
+        <tr>
+          <td>Final Verdict</td>
+          <td style="font-weight:700; color:${accentColor};">${statusWord} — ${passed ? "Meets benchmark" : "Below benchmark"}</td>
+        </tr>
+      </table>
+
+      <!-- Official note -->
+      <div class="official-note">
+        <div class="official-note-title">Official Statement</div>
+        <p>
+          This certificate was generated by the PharmTechSuccess CBT Platform and accurately reflects the
+          candidate's performance for the examination paper listed above.
+          ${result?.previewMode ? " Note: This result covers the preview portion of the paper only." : " This result reflects a full completed paper attempt."}
+          Reference: PTS-RESULT-${paperId}
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="doc-footer">
+        <div class="footer-left">
+          Generated by <strong>PharmTechSuccess</strong> · ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+        </div>
+        <div class="footer-brand">PharmTechSuccess</div>
+        <div class="footer-ref">PTS-${paperId}</div>
+      </div>
+
+    </div><!-- /content -->
+
+    <div class="bottom-accent-line"></div>
+    <div class="bottom-band"></div>
+  </div>
+
+  <script>
+    window.onload = function () {
+      window.print();
+      window.onafterprint = function () { window.close(); };
+    };
+  </script>
+</body>
+</html>
     `);
     printWindow.document.close();
   };
@@ -450,6 +766,8 @@ export default function ResultPage() {
     <main className="min-h-screen bg-slate-100 py-5 sm:py-6 lg:py-10">
       <Container>
         <div className="space-y-5 sm:space-y-6">
+
+          {/* ── Header banner ── */}
           <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(20,184,166,0.10),transparent_24%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.08),transparent_28%)]" />
             <div className="relative p-5 sm:p-6 lg:p-8">
@@ -510,6 +828,7 @@ export default function ResultPage() {
             </div>
           </div>
 
+          {/* ── Preview mode warning ── */}
           {isPreviewMode && (
             <div className="rounded-[26px] border border-amber-200 bg-amber-50 p-5 shadow-sm">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -541,6 +860,7 @@ export default function ResultPage() {
             </div>
           )}
 
+          {/* ── Stat cards ── */}
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <StatCard
               icon={Trophy}
@@ -572,374 +892,7 @@ export default function ResultPage() {
             />
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-[1.18fr_0.82fr]">
-            <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
-                    Performance Overview
-                  </h2>
-                  <p className="mt-1 text-sm leading-6 text-slate-500">
-                    {isPreviewMode
-                      ? "Preview performance based only on the free accessible questions."
-                      : "Overall score quality, accuracy, and final benchmark assessment."}
-                  </p>
-                </div>
-
-                <div
-                  className={`inline-flex rounded-2xl px-4 py-2 text-sm font-semibold ${
-                    passed
-                      ? "bg-teal-50 text-teal-700"
-                      : "bg-red-50 text-red-700"
-                  }`}
-                >
-                  {performanceLabel}
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-[24px] border border-slate-200 bg-slate-50 p-4 sm:p-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                      Overall Percentage
-                    </p>
-                    <p className="mt-2 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-                      {result.percentage}%
-                    </p>
-                  </div>
-
-                  <div
-                    className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
-                      passed
-                        ? "bg-teal-100 text-teal-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    <Target size={16} />
-                    {passed ? "Above pass benchmark" : "Below pass benchmark"}
-                  </div>
-                </div>
-
-                <div className="mt-5 h-4 overflow-hidden rounded-full bg-slate-200">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      passed ? "bg-teal-600" : "bg-red-600"
-                    }`}
-                    style={{ width: `${result.percentage}%` }}
-                  />
-                </div>
-
-                <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                      Correct
-                    </p>
-                    <p className="mt-2 text-2xl font-bold text-slate-900">
-                      {result.score}
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                      Wrong
-                    </p>
-                    <p className="mt-2 text-2xl font-bold text-slate-900">
-                      {wrongAnswers}
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                    <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                      Flagged
-                    </p>
-                    <p className="mt-2 text-2xl font-bold text-slate-900">
-                      {result.flaggedCount}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {isPreviewMode && (
-                <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                  <p className="text-sm font-semibold text-amber-800">
-                    Preview scope
-                  </p>
-                  <p className="mt-1 text-sm leading-6 text-amber-700">
-                    You attempted {result.totalQuestions} question
-                    {result.totalQuestions !== 1 ? "s" : ""} from a full paper of{" "}
-                    {fullPaperQuestions} questions.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
-                    Final Status
-                  </h2>
-                  <p className="mt-1 text-sm leading-6 text-slate-500">
-                    Decision based on the official {passMark}% pass mark.
-                  </p>
-                </div>
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
-                  <Medal size={18} />
-                </div>
-              </div>
-
-              <div
-                className={`mt-6 rounded-[24px] p-5 ${
-                  passed ? "bg-teal-50" : "bg-red-50"
-                }`}
-              >
-                <div
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold ${
-                    passed
-                      ? "bg-teal-600 text-white"
-                      : "bg-red-600 text-white"
-                  }`}
-                >
-                  {passed ? <BadgeCheck size={18} /> : <BadgeX size={18} />}
-                  {passed ? "PASS" : "FAIL"}
-                </div>
-
-                <p className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
-                  {performanceLabel}
-                </p>
-
-                <p className="mt-2 text-sm leading-7 text-slate-600">
-                  {isPreviewMode
-                    ? passed
-                      ? "Strong preview performance. Unlock the full paper to test yourself across the complete exam."
-                      : "This preview result highlights weak areas early. Unlock the full paper to practice deeper."
-                    : passed
-                    ? "Congratulations. Your performance meets the benchmark for this Pharm Tech CBT."
-                    : "Your score is below the required benchmark. Review corrections carefully and retake the paper."}
-                </p>
-              </div>
-
-              <div className="mt-6 grid gap-3">
-                <button
-                  onClick={handlePrintSlip}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white transition hover:bg-slate-800"
-                >
-                  <Printer size={18} />
-                  Print Premium Result Slip
-                </button>
-
-                <button
-                  onClick={handlePrintSlip}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
-                >
-                  <Download size={18} />
-                  Download / Save Result Slip
-                </button>
-
-                {isPreviewMode && (
-                  <Link
-                    href="/pricing"
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-amber-400"
-                  >
-                    <Crown size={18} />
-                    Unlock Full Paper
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div
-            ref={slipRef}
-            className="print-slip-shell overflow-hidden rounded-[30px] border border-slate-200 bg-white shadow-sm"
-          >
-            <div className="bg-[radial-gradient(circle_at_top_right,rgba(20,184,166,0.12),transparent_24%),radial-gradient(circle_at_top_left,rgba(59,130,246,0.10),transparent_28%),linear-gradient(135deg,#0f172a_0%,#111827_45%,#0f766e_100%)] px-5 py-6 text-white sm:px-6 sm:py-8">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-200">
-                PharmTechSuccess Official Result Sheet
-              </p>
-
-              <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-                {isPreviewMode ? "CBT Preview Result Slip" : "Premium CBT Result Slip"}
-              </h2>
-
-              <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-200">
-                Pharmacy Technician Computer-Based Test official performance sheet.
-              </p>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {isPreviewMode ? (
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-bold text-white">
-                    <Lock size={14} />
-                    Free Preview Result
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-bold text-white">
-                    <Crown size={14} />
-                    Full Premium Result
-                  </span>
-                )}
-
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-xs font-bold text-white">
-                  <ShieldCheck size={14} />
-                  Verified CBT Sheet
-                </span>
-              </div>
-            </div>
-
-            <div className="p-5 sm:p-6 lg:p-8">
-              <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-                <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                    Overall Score
-                  </p>
-                  <p className="mt-3 text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl">
-                    {result.percentage}%
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {result.score} correct answer{result.score !== 1 ? "s" : ""} out of{" "}
-                    {result.totalQuestions} question{result.totalQuestions !== 1 ? "s" : ""}.
-                  </p>
-
-                  <div className="mt-5 h-4 overflow-hidden rounded-full bg-slate-200">
-                    <div
-                      className={`h-full rounded-full ${
-                        passed ? "bg-teal-600" : "bg-red-600"
-                      }`}
-                      style={{ width: `${result.percentage}%` }}
-                    />
-                  </div>
-
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                        Performance
-                      </p>
-                      <p className="mt-2 text-base font-bold text-slate-900">
-                        {performanceLabel}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                        Final Status
-                      </p>
-                      <p
-                        className={`mt-2 text-base font-bold ${
-                          passed ? "text-teal-700" : "text-red-700"
-                        }`}
-                      >
-                        {passed ? "PASS" : "FAIL"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-[24px] border border-slate-200 bg-white p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                    Candidate Summary
-                  </p>
-
-                  <div
-                    className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[20px] px-4 py-4 text-lg font-bold ${
-                      passed
-                        ? "bg-teal-100 text-teal-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
-                  >
-                    {passed ? <BadgeCheck size={20} /> : <BadgeX size={20} />}
-                    {passed ? "PASS" : "FAIL"}
-                  </div>
-
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        Answered
-                      </p>
-                      <p className="mt-2 text-2xl font-bold text-slate-900">
-                        {result.answeredCount}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        Unanswered
-                      </p>
-                      <p className="mt-2 text-2xl font-bold text-slate-900">
-                        {result.unansweredCount}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        Wrong
-                      </p>
-                      <p className="mt-2 text-2xl font-bold text-slate-900">
-                        {wrongAnswers}
-                      </p>
-                    </div>
-
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        Time Used
-                      </p>
-                      <p className="mt-2 text-2xl font-bold text-slate-900">
-                        {formatTimeUsed(result.timeUsed)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-4 md:grid-cols-2">
-                <ResultSlipCard label="Exam Paper" value={result.paperTitle} wide />
-                <ResultSlipCard
-                  label="Submission Type"
-                  value={result.autoSubmitted ? "Auto Submitted" : "Manual Submission"}
-                />
-                <ResultSlipCard
-                  label="Submitted At"
-                  value={submittedDate}
-                />
-                <ResultSlipCard
-                  label="Pass Benchmark"
-                  value={`${passMark}%`}
-                />
-                <ResultSlipCard
-                  label="Question Scope"
-                  value={
-                    isPreviewMode
-                      ? `${result.totalQuestions} preview questions out of ${fullPaperQuestions} total questions`
-                      : `${result.totalQuestions} full paper questions`
-                  }
-                />
-              </div>
-
-              <div className="mt-5 rounded-[24px] border border-dashed border-slate-300 bg-slate-50 p-4 sm:p-5">
-                <div className="flex items-start gap-3">
-                  <FileText size={18} className="mt-0.5 shrink-0 text-slate-600" />
-                  <div>
-                    <p className="text-sm font-semibold text-slate-800">
-                      Official Note
-                    </p>
-                    <p className="mt-1 text-sm leading-7 text-slate-600">
-                      This sheet was generated by the PharmTechSuccess CBT Platform and
-                      summarizes the candidate’s performance for this paper.
-                      {isPreviewMode
-                        ? " Since this is a preview attempt, it reflects only the accessible portion of the paper."
-                        : " This result reflects the full completed paper attempt."}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-col gap-3 border-t border-dashed border-slate-300 pt-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-                <p>Generated by PharmTechSuccess CBT Platform</p>
-                <p>Result sheet reference: PTS-RESULT-{paperId}</p>
-              </div>
-            </div>
-          </div>
-
+          {/* ── Question Review ── */}
           <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -1048,6 +1001,315 @@ export default function ResultPage() {
             </div>
           </div>
 
+          {/* ── Performance Overview ── */}
+          <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
+                  Performance Overview
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-slate-500">
+                  {isPreviewMode
+                    ? "Preview performance based only on the free accessible questions."
+                    : "Overall score quality, accuracy, and final benchmark assessment."}
+                </p>
+              </div>
+
+              <div
+                className={`inline-flex rounded-2xl px-4 py-2 text-sm font-semibold ${
+                  passed
+                    ? "bg-teal-50 text-teal-700"
+                    : "bg-red-50 text-red-700"
+                }`}
+              >
+                {performanceLabel}
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-[24px] border border-slate-200 bg-slate-50 p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                    Overall Percentage
+                  </p>
+                  <p className="mt-2 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+                    {result.percentage}%
+                  </p>
+                </div>
+
+                <div
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
+                    passed
+                      ? "bg-teal-100 text-teal-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  <Target size={16} />
+                  {passed ? "Above pass benchmark" : "Below pass benchmark"}
+                </div>
+              </div>
+
+              <div className="mt-5 h-4 overflow-hidden rounded-full bg-slate-200">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    passed ? "bg-teal-600" : "bg-red-600"
+                  }`}
+                  style={{ width: `${result.percentage}%` }}
+                />
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                    Correct
+                  </p>
+                  <p className="mt-2 text-2xl font-bold text-slate-900">
+                    {result.score}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                    Wrong
+                  </p>
+                  <p className="mt-2 text-2xl font-bold text-slate-900">
+                    {wrongAnswers}
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
+                    Flagged
+                  </p>
+                  <p className="mt-2 text-2xl font-bold text-slate-900">
+                    {result.flaggedCount}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {isPreviewMode && (
+              <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                <p className="text-sm font-semibold text-amber-800">
+                  Preview scope
+                </p>
+                <p className="mt-1 text-sm leading-6 text-amber-700">
+                  You attempted {result.totalQuestions} question
+                  {result.totalQuestions !== 1 ? "s" : ""} from a full paper of{" "}
+                  {fullPaperQuestions} questions.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* ── Premium Result Slip (in-page preview) ── */}
+          <div
+            ref={slipRef}
+            className="print-slip-shell overflow-hidden rounded-[16px] border border-stone-200 bg-[#fffef9] shadow-lg"
+            style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+          >
+            {/* Top bands */}
+            <div className={`h-2 ${passed ? "bg-teal-700" : "bg-red-700"}`} />
+            <div className={`h-1 ${passed ? "bg-teal-500/40" : "bg-red-400/40"}`} />
+
+            <div className="p-6 sm:p-8 lg:p-10">
+              {/* Masthead */}
+              <div className="flex items-start justify-between gap-6 border-b border-stone-200 pb-6">
+                <div>
+                  <p className={`text-[10px] font-bold uppercase tracking-[0.28em] ${passed ? "text-teal-700" : "text-red-700"} mb-1.5`}>
+                    Official Performance Certificate
+                  </p>
+                  <p className="font-serif text-2xl font-semibold text-stone-900 sm:text-3xl" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                    PharmTech<em className={`italic ${passed ? "text-teal-700" : "text-red-700"}`}>Success</em>
+                  </p>
+                  <p className="mt-1 text-[11px] text-stone-500">
+                    Pharmacy Technician Computer-Based Test Platform
+                  </p>
+                </div>
+
+                <div className={`flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-full border-[3px] ${passed ? "border-teal-600 bg-teal-50 text-teal-700" : "border-red-600 bg-red-50 text-red-700"}`}>
+                  <span className="font-serif text-xl font-bold leading-none" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                    {passed ? "PASS" : "FAIL"}
+                  </span>
+                  <span className="mt-1 text-[8px] font-semibold uppercase tracking-wider opacity-70">
+                    {passed ? "Passed" : "Failed"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Document title */}
+              <div className="border-b border-stone-200 py-5 text-center">
+                <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-stone-400 mb-2">
+                  CBT Performance Result Sheet
+                </p>
+                <h2 className="font-serif text-2xl font-semibold leading-snug text-stone-900 sm:text-3xl" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                  {result.paperTitle}
+                </h2>
+                <div className="mt-3 flex items-center justify-center gap-3">
+                  <div className="h-px w-14 bg-stone-300" />
+                  <div className={`h-1.5 w-1.5 rotate-45 ${passed ? "bg-teal-600" : "bg-red-600"}`} />
+                  <div className="h-px w-14 bg-stone-300" />
+                </div>
+              </div>
+
+              {/* Score hero */}
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {/* Score main */}
+                <div className={`relative overflow-hidden rounded-xl border border-stone-200 bg-stone-50 p-5`}>
+                  <div className={`absolute inset-y-0 left-0 w-1 rounded-l-xl ${passed ? "bg-teal-600" : "bg-red-600"}`} />
+                  <p className="text-[9px] font-bold uppercase tracking-[0.26em] text-stone-400 mb-1">
+                    Overall Score
+                  </p>
+                  <p className="font-serif leading-none text-stone-900" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: "64px", fontWeight: 700 }}>
+                    {result.percentage}<span className="text-4xl text-stone-500">%</span>
+                  </p>
+                  <p className="mt-1 text-xs text-stone-500">
+                    {result.score} correct out of {result.totalQuestions} questions
+                  </p>
+                  <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-stone-200">
+                    <div
+                      className={`h-full rounded-full ${passed ? "bg-teal-600" : "bg-red-600"}`}
+                      style={{ width: `${result.percentage}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Stats pills */}
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { label: "Correct", value: result.score },
+                    { label: "Wrong", value: wrongAnswers },
+                    { label: "Unanswered", value: result.unansweredCount },
+                    { label: "Time Used", value: formatTimeUsed(result.timeUsed) },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex items-center justify-between rounded-xl border border-stone-200 bg-stone-50 px-4 py-3">
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-stone-400">{label}</span>
+                      <span className="font-serif text-xl font-bold text-stone-900 leading-none" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                        {value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Performance label */}
+              <div className="mt-5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-stone-200" />
+                  <div className={`h-1.5 w-1.5 rotate-45 border ${passed ? "border-teal-600" : "border-red-600"}`} />
+                  <div className="h-px flex-1 bg-stone-200" />
+                </div>
+                <div className={`flex items-center justify-between rounded-lg border px-5 py-3 ${passed ? "border-teal-300 bg-teal-50" : "border-red-300 bg-red-50"}`}>
+                  <span className={`text-[9px] font-bold uppercase tracking-[0.24em] ${passed ? "text-teal-600" : "text-red-600"}`}>
+                    Performance Assessment
+                  </span>
+                  <span className={`font-serif text-lg font-bold ${passed ? "text-teal-700" : "text-red-700"}`} style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                    {performanceLabel}
+                  </span>
+                </div>
+              </div>
+
+              {/* Details table */}
+              <div className="mt-6">
+                <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-stone-400 mb-3">
+                  Examination Details
+                </p>
+                <table className="w-full text-sm">
+                  <tbody>
+                    {[
+                      ["Exam Paper", result.paperTitle],
+                      ["Submission Type", result.autoSubmitted ? "Auto Submitted (Time Expired)" : "Manual Submission"],
+                      ["Submitted At", submittedDate],
+                      ["Pass Benchmark", "50%"],
+                      ["Question Scope", isPreviewMode ? `${result.totalQuestions} preview of ${fullPaperQuestions} total` : `${result.totalQuestions} questions (Full Paper)`],
+                      ["Final Verdict", passed ? "PASS — Meets benchmark" : "FAIL — Below benchmark"],
+                    ].map(([label, value], i, arr) => (
+                      <tr key={label} className={i < arr.length - 1 ? "border-b border-stone-100" : ""}>
+                        <td className="py-2.5 pr-4 text-[10px] font-semibold uppercase tracking-[0.06em] text-stone-400 w-[40%]">
+                          {label}
+                        </td>
+                        <td className={`py-2.5 text-[12.5px] font-medium ${label === "Final Verdict" ? (passed ? "font-bold text-teal-700" : "font-bold text-red-700") : "text-stone-700"}`}>
+                          {value}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Official note */}
+              <div className={`mt-5 rounded-r-xl border-l-[3px] bg-stone-50 px-4 py-3 ${passed ? "border-teal-600" : "border-red-600"}`}>
+                <p className={`text-[9px] font-bold uppercase tracking-[0.22em] mb-1 ${passed ? "text-teal-700" : "text-red-700"}`}>
+                  Official Statement
+                </p>
+                <p className="text-[11px] leading-relaxed text-stone-500">
+                  This certificate was generated by the PharmTechSuccess CBT Platform and accurately reflects
+                  the candidate's performance for the examination paper listed above.
+                  {isPreviewMode
+                    ? " This result covers the preview portion of the paper only."
+                    : " This result reflects a full completed paper attempt."}
+                  {" "}Reference: PTS-RESULT-{paperId}
+                </p>
+              </div>
+
+              {/* Footer */}
+              <div className="mt-6 flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-[10px] text-stone-400">
+                  Generated by <span className="font-semibold text-stone-600">PharmTechSuccess</span>
+                </p>
+                <p className="font-serif text-sm font-semibold text-stone-600" style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                  PharmTechSuccess
+                </p>
+                <p className="rounded border border-stone-200 bg-stone-50 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-stone-400">
+                  PTS-{paperId}
+                </p>
+              </div>
+            </div>
+
+            {/* Bottom bands */}
+            <div className={`h-1 ${passed ? "bg-teal-500/40" : "bg-red-400/40"}`} />
+            <div className={`h-2 ${passed ? "bg-teal-700" : "bg-red-700"}`} />
+          </div>
+
+          {/* ── Print / Download actions ── */}
+          <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+            <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">
+              Save Your Result Slip
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-slate-500">
+              Print or download your official CBT result sheet for your records.
+            </p>
+
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                onClick={handlePrintSlip}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 font-semibold text-white transition hover:bg-slate-800"
+              >
+                <Printer size={18} />
+                Print Premium Result Slip
+              </button>
+
+              <button
+                onClick={handlePrintSlip}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+              >
+                <Download size={18} />
+                Download / Save Result Slip
+              </button>
+
+              {isPreviewMode && (
+                <Link
+                  href="/pricing"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-amber-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-amber-400"
+                >
+                  <Crown size={18} />
+                  Unlock Full Paper
+                </Link>
+              )}
+            </div>
+          </div>
+
+          {/* ── Bottom nav ── */}
           <div className="flex flex-wrap gap-3">
             <Link
               href="/papers"
@@ -1074,6 +1336,7 @@ export default function ResultPage() {
               </Link>
             )}
           </div>
+
         </div>
       </Container>
     </main>
