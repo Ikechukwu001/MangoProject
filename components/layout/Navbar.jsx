@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Menu, X, ChevronRight, Crown, BadgeCheck, AlertCircle } from "lucide-react";
+import { Menu, X, ChevronRight, Crown, BadgeCheck, AlertCircle, Zap } from "lucide-react";
 import Container from "./Container";
 import useUserProfile from "@/src/hooks/useUserProfile";
 
@@ -28,9 +28,44 @@ export default function Navbar() {
 
   return (
     <>
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        .cta-shimmer {
+          background: linear-gradient(
+            105deg,
+            #0f766e 0%,
+            #0d9488 30%,
+            #5eead4 50%,
+            #0d9488 70%,
+            #0f766e 100%
+          );
+          background-size: 200% auto;
+          animation: shimmer 3s linear infinite;
+          transition: opacity 0.2s;
+        }
+        .cta-shimmer:hover { opacity: 0.92; }
+        .mobile-cta-shimmer {
+          background: linear-gradient(
+            105deg,
+            #0f766e 0%,
+            #0d9488 30%,
+            #5eead4 50%,
+            #0d9488 70%,
+            #0f766e 100%
+          );
+          background-size: 200% auto;
+          animation: shimmer 3s linear infinite;
+        }
+      `}</style>
+
       <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
         <Container>
           <div className="flex h-20 items-center justify-between">
+
+            {/* LOGO */}
             <Link href="/" className="flex items-center gap-3" onClick={closeMenu}>
               <div className="relative h-11 w-11 overflow-hidden rounded-2xl">
                 <Image
@@ -40,17 +75,13 @@ export default function Navbar() {
                   className="object-cover"
                 />
               </div>
-
               <div className="flex flex-col leading-tight">
-                <span className="text-lg font-bold text-slate-900">
-                  PharmTechSuccess.
-                </span>
-                <span className="text-xs text-slate-500">
-                  CBT Practice Platform
-                </span>
+                <span className="text-lg font-bold text-slate-900">PharmTechSuccess.</span>
+                <span className="text-xs text-slate-500">CBT Practice Platform</span>
               </div>
             </Link>
 
+            {/* DESKTOP NAV LINKS */}
             <nav className="hidden items-center gap-8 md:flex">
               {navLinks.map((link) => (
                 <Link
@@ -63,25 +94,25 @@ export default function Navbar() {
               ))}
             </nav>
 
+            {/* DESKTOP AUTH BUTTONS */}
             <div className="hidden items-center gap-3 md:flex">
               {loading ? (
-                <div className="rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-500">
-                  Loading...
-                </div>
+                <div className="h-10 w-32 animate-pulse rounded-xl bg-slate-100" />
               ) : !user ? (
                 <>
+                  {/* Both link to homepage auth section */}
                   <Link
-                    href="/"
-                    className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                    href="/#auth-section"
+                    className="rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:text-teal-700"
                   >
-                    Login
+                    Sign in
                   </Link>
-
                   <Link
-                    href="/"
-                    className="rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-teal-200 transition hover:bg-teal-800"
+                    href="/#auth-section"
+                    className="cta-shimmer inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-teal-200/60"
                   >
-                    Start Practicing
+                    <Zap size={14} className="shrink-0" />
+                    Start Free
                   </Link>
                 </>
               ) : isPremium ? (
@@ -92,7 +123,6 @@ export default function Navbar() {
                   >
                     Dashboard
                   </Link>
-
                   <div className="inline-flex items-center gap-2 rounded-xl bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-700">
                     <BadgeCheck size={16} />
                     Premium Active
@@ -106,7 +136,6 @@ export default function Navbar() {
                   >
                     Dashboard
                   </Link>
-
                   <div className="inline-flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700">
                     <AlertCircle size={16} />
                     Pending Review
@@ -120,18 +149,18 @@ export default function Navbar() {
                   >
                     Dashboard
                   </Link>
-
                   <Link
                     href="/pricing"
-                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-amber-600"
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-amber-200 transition hover:bg-amber-600"
                   >
-                    <Crown size={16} />
+                    <Crown size={15} />
                     Upgrade
                   </Link>
                 </>
               )}
             </div>
 
+            {/* MOBILE TOGGLE */}
             <button
               onClick={() => setMenuOpen((prev) => !prev)}
               className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white md:hidden"
@@ -142,6 +171,7 @@ export default function Navbar() {
         </Container>
       </header>
 
+      {/* MOBILE BACKDROP */}
       <div
         className={`fixed inset-0 z-40 bg-black/30 transition ${
           menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
@@ -149,6 +179,7 @@ export default function Navbar() {
         onClick={closeMenu}
       />
 
+      {/* MOBILE MENU */}
       <div
         className={`fixed inset-x-0 top-[80px] z-50 mx-4 rounded-3xl bg-white p-5 shadow-2xl transition ${
           menuOpen
@@ -173,24 +204,23 @@ export default function Navbar() {
         <div className="my-5 h-px bg-slate-200" />
 
         {loading ? (
-          <div className="rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-500">
-            Loading...
-          </div>
+          <div className="h-12 animate-pulse rounded-2xl bg-slate-100" />
         ) : !user ? (
           <div className="flex flex-col gap-3">
             <Link
-              href="/login"
+              href="/#auth-section"
               onClick={closeMenu}
               className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
-              Login
+              Sign in
             </Link>
             <Link
-              href="/register"
+              href="/#auth-section"
               onClick={closeMenu}
-              className="rounded-2xl bg-teal-700 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-teal-800"
+              className="mobile-cta-shimmer inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-white shadow-lg shadow-teal-200/50"
             >
-              Start Practicing
+              <Zap size={15} />
+              Start Practicing Free
             </Link>
           </div>
         ) : isPremium ? (
@@ -203,6 +233,7 @@ export default function Navbar() {
               Dashboard
             </Link>
             <div className="rounded-2xl bg-teal-50 px-4 py-3 text-center text-sm font-semibold text-teal-700">
+              <BadgeCheck size={15} className="mr-1 inline" />
               Premium Active
             </div>
           </div>
@@ -216,6 +247,7 @@ export default function Navbar() {
               Dashboard
             </Link>
             <div className="rounded-2xl bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-amber-700">
+              <AlertCircle size={15} className="mr-1 inline" />
               Premium Pending
             </div>
           </div>
@@ -231,8 +263,9 @@ export default function Navbar() {
             <Link
               href="/pricing"
               onClick={closeMenu}
-              className="rounded-2xl bg-amber-500 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-amber-600"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-amber-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-amber-600"
             >
+              <Crown size={15} />
               Upgrade to Premium
             </Link>
           </div>
