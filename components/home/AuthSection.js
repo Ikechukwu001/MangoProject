@@ -9,9 +9,6 @@ import { FcGoogle } from "react-icons/fc";
 import { createClient } from "@/src/lib/supabase/client";
 import accessAnimation from "@/public/lottie/Email.json";
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_APP_URL || "https://pharmtechsuccess.study";
-
 export default function AuthSection() {
   const supabase = createClient();
   const router = useRouter();
@@ -67,30 +64,30 @@ export default function AuthSection() {
     setMessageType("default");
   };
 
- const handleGoogleSignIn = async () => {
-  resetMessage();
-  setGoogleLoading(true);
+  const handleGoogleSignIn = async () => {
+    resetMessage();
+    setGoogleLoading(true);
 
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${SITE_URL}/auth/callback?next=/papers`,
-      queryParams: {
-        access_type: "offline",
-        prompt: "consent",
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=/papers`, // ✅ Fix 2
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent",
+        },
       },
-    },
-  });
+    });
 
-  if (error) {
-    console.error("Google sign in error:", error);
-    setMessage(
-      error.message || "Google sign in failed. Check Supabase redirect URLs."
-    );
-    setMessageType("error");
-    setGoogleLoading(false);
-  }
-};
+    if (error) {
+      console.error("Google sign in error:", error);
+      setMessage(
+        error.message || "Google sign in failed. Check Supabase redirect URLs."
+      );
+      setMessageType("error");
+      setGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,7 +99,7 @@ export default function AuthSection() {
         email,
         password,
         options: {
-          emailRedirectTo: `${SITE_URL}/auth/callback?next=/papers`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/papers`, // ✅ Fix 2
           data: {
             full_name: fullName,
           },
@@ -150,7 +147,8 @@ export default function AuthSection() {
 
   return (
     <section
-     id="auth-section" className="scroll-mt-24"
+      id="auth-section"
+      className="scroll-mt-24"
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -547,9 +545,7 @@ export default function AuthSection() {
                       ) : (
                         <>
                           <span>
-                            {mode === "signup"
-                              ? "Create Account"
-                              : "Sign In"}
+                            {mode === "signup" ? "Create Account" : "Sign In"}
                           </span>
                           <ArrowRight size={16} />
                         </>
