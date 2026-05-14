@@ -1,6 +1,6 @@
 // app/api/paystack/webhook/route.js
 import { NextResponse } from "next/server";
-import { createClient } from "@/src/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 
 export async function POST(request) {
@@ -34,9 +34,13 @@ export async function POST(request) {
       return NextResponse.json({ error: "Missing user_id" }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    // Service role key bypasses RLS
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
 
-    // Idempotency check — don't double-activate
+    // Idempotency check
     const { data: existingRequest } = await supabase
       .from("premium_requests")
       .select("status")

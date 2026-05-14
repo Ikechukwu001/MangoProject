@@ -1,6 +1,6 @@
 // app/api/paystack/verify/route.js
 import { NextResponse } from "next/server";
-import { createClient } from "@/src/lib/supabase/server"; // adjust to your server supabase client path
+import { createClient } from "@supabase/supabase-js";
 
 export async function GET(request) {
   try {
@@ -36,7 +36,7 @@ export async function GET(request) {
       );
     }
 
-    const { metadata, customer, amount } = paystackData.data;
+    const { metadata, amount } = paystackData.data;
     const userId = metadata?.user_id;
 
     if (!userId) {
@@ -46,9 +46,12 @@ export async function GET(request) {
       );
     }
 
-    // Use service role client here since this runs server-side after redirect
-    // (user session may not be available in the request)
-    const supabase = await createClient();
+    // Use service role key — bypasses RLS so updates always work
+    // even when there is no user session (server-side redirect)
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
 
     // Idempotency: check if already activated
     const { data: existingRequest } = await supabase
@@ -58,28 +61,35 @@ export async function GET(request) {
       .maybeSingle();
 
     if (existingRequest?.status === "approved") {
-      // Already processed — safe to return success
       return NextResponse.json({ success: true, already_activated: true });
     }
 
-    // Update the premium_request to approved
-    await supabase
+    // Update premium_requests to approved
+    const { error: requestError } = await supabase
       .from("premium_requests")
       .update({
         status: "approved",
         paid_at: new Date().toISOString(),
-        paystack_amount_paid: amount / 100, // convert kobo to naira
+        paystack_amount_paid: amount / 100,
       })
       .eq("reference", reference);
 
+    if (requestError) {
+      console.error("Failed to update premium_requests:", requestError);
+    }
+
     // Upgrade the profile
-    await supabase
+    const { error: profileError } = await supabase
       .from("profiles")
       .update({
         plan: "premium",
         premium_status: "active",
       })
       .eq("id", userId);
+
+    if (profileError) {
+      console.error("Failed to update profile:", profileError);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
