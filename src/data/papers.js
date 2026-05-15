@@ -24,6 +24,30 @@ const papers = [
     isPremium: true,
   },
   {
+    id: "npce-eng-2021",
+    title: "NPCE Use of English Language 2021",
+    subject: "English Language",
+    year: 2021,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE August 2021 English paper covering comprehension, grammar, antonyms, idioms, synonyms, sentence completion and phonetics.",
+    isPremium: true,
+  },
+  {
+    id: "npce-eng-2019",
+    title: "NPCE Use of English Language 2019",
+    subject: "English Language",
+    year: 2019,
+    duration: 90,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2019 English paper covering antonyms, sentence completion, idioms, comprehension passages, synonyms and grammar.",
+    isPremium: true,
+  },
+  {
     id: "npce-aum-2022",
     title: "NPCE Actions & Uses of Medicines 2022",
     subject: "Actions & Uses of Medicines",
