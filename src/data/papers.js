@@ -47,6 +47,42 @@ const papers = [
       "NPCE 2019 English paper covering antonyms, sentence completion, idioms, comprehension passages, synonyms and grammar.",
     isPremium: true,
   },
+   {
+    id: "npce-eng-2020",
+    title: "NPCE Use of English Language 2020",
+    subject: "English Language",
+    year: 2020,
+    duration: 90,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2020 English paper covering antonyms, sentence completion, idioms, comprehension, synonyms, grammar and cloze passages.",
+    isPremium: true,
+  },
+  {
+    id: "npce-eng-2022",
+    title: "NPCE Use of English Language 2022",
+    subject: "English Language",
+    year: 2022,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2022 English paper covering antonyms, synonyms, idioms, sentence completion, comprehension passage and cloze test.",
+    isPremium: true,
+  },
+  {
+    id: "npce-eng-2023",
+    title: "NPCE Use of English Language 2023",
+    subject: "English Language",
+    year: 2023,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2023 English paper covering antonyms, sentence completion, idioms, cloze passage, synonyms and grammar usage.",
+    isPremium: true,
+  },
   {
     id: "npce-aum-2022",
     title: "NPCE Actions & Uses of Medicines 2022",
