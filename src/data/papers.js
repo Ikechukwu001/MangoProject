@@ -84,6 +84,42 @@ const papers = [
     isPremium: true,
   },
   {
+  id: "npce-pptp-2021",
+  title: "NPCE Pharmacy Technician Practice 2021",
+  subject: "Pharmacy Technician Practice",
+  year: 2021,
+  duration: 105,
+  totalQuestions: 100,
+  freeQuestions: 10,
+  description:
+    "NPCE 2021 Pharmacy Technician Practice paper covering drug laws, PCN, NAFDAC, NDLEA, dispensing, drug distribution, ethics, hospital pharmacy, and pharmaceutical care.",
+  isPremium: true,
+},
+{
+  id: "npce-pptp-2022",
+  title: "NPCE Pharmacy Technician Practice 2022",
+  subject: "Pharmacy Technician Practice",
+  year: 2022,
+  duration: 105,
+  totalQuestions: 100,
+  freeQuestions: 10,
+  description:
+    "NPCE 2022 Pharmacy Technician Practice paper covering pharmacy law, drug regulation, dispensing procedures, stock management, ethics, hospital and community pharmacy practice.",
+  isPremium: true,
+},
+{
+  id: "npce-pptp-2023",
+  title: "NPCE Pharmacy Technician Practice 2023",
+  subject: "Pharmacy Technician Practice",
+  year: 2023,
+  duration: 105,
+  totalQuestions: 100,
+  freeQuestions: 10,
+  description:
+    "NPCE 2023 Pharmacy Technician Practice paper covering PCN regulations, NAFDAC mandates, narcotic drug control, dispensing, stock management, pharmaceutical ethics and drug policy.",
+  isPremium: true,
+},
+  {
     id: "npce-aum-2022",
     title: "NPCE Actions & Uses of Medicines 2022",
     subject: "Actions & Uses of Medicines",
