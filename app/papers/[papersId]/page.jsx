@@ -20,6 +20,7 @@ import {
 import Container from "@/components/layout/Container";
 import getPaperById from "@/lib/getPaperById";
 import { createClient } from "@/src/lib/supabase/server";
+import StreakDashboard from "@/components/papers/StreakDashboard";
 
 function formatDuration(minutes) {
   const hours = Math.floor(minutes / 60);
@@ -105,6 +106,11 @@ export default async function PaperDetailsPage({ params }) {
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50 py-12 sm:py-20">
       <Container>
+
+        {/* StreakDashboard is already imported from @/components/papers/StreakDashboard */}
+        <div className="bg-red-500 p-10 text-white">
+  STREAK DASHBOARD TEST
+            </div>
 
         {/* ── BREADCRUMB ── */}
         <Link

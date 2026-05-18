@@ -22,6 +22,8 @@ import Container from "@/components/layout/Container";
 import getPaperById from "@/lib/getPaperById";
 import questions from "@/src/data/questions";
 import { createClient } from "@/src/lib/supabase/client";
+// Change 1 — import useStreak
+import { useStreak } from "@/src/hooks/useStreak";  
 
 function StatCard({ icon: Icon, label, value, tone = "default" }) {
   const toneClasses =
@@ -218,7 +220,7 @@ function PremiumModal({
 
           <p className="mt-4 text-sm leading-6 text-slate-600 sm:text-[15px]">
             {lockReason === "preview-limit"
-              ? `You’ve reached the free preview limit of ${freePreviewCount} questions. Upgrade to premium to unlock all ${paperQuestionsLength} questions and continue your CBT practice without interruption.`
+              ? `You've reached the free preview limit of ${freePreviewCount} questions. Upgrade to premium to unlock all ${paperQuestionsLength} questions and continue your CBT practice without interruption.`
               : "This part of the paper is available only for premium users."}
           </p>
         </div>
@@ -338,6 +340,9 @@ export default function ExamPage() {
   const [lockReason, setLockReason] = useState("preview-limit");
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [justActivated, setJustActivated] = useState(false);
+
+  // Change 2 — destructure recordAnswer from useStreak
+ const { recordAnswer } = useStreak(profile?.id);
 
   const isPremium =
     profile?.plan === "premium" || profile?.premium_status === "active";
@@ -816,12 +821,23 @@ export default function ExamPage() {
                       return (
                         <button
                           key={index}
+                          // Change 3 — record streak only on first answer to this question
                           onClick={() => {
                             if (!isPremium && currentIndex >= freePreviewCount) {
                               setLockReason("preview-limit");
                               setShowPremiumModal(true);
                               return;
                             }
+
+                              const isFirstAnswer =
+                                answers[currentIndex] === undefined;
+
+                              const isCorrect =
+                                option === currentQuestion.answer;
+
+                              if (isFirstAnswer) {
+                                recordAnswer(isCorrect);
+                              }
 
                             setAnswers((prev) => ({
                               ...prev,
