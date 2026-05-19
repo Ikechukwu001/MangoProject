@@ -22,8 +22,8 @@ import Container from "@/components/layout/Container";
 import getPaperById from "@/lib/getPaperById";
 import questions from "@/src/data/questions";
 import { createClient } from "@/src/lib/supabase/client";
-// Change 1 — import useStreak
-import { useStreak } from "@/src/hooks/useStreak";  
+import { useStreak } from "@/src/hooks/useStreak";
+import { useConfidence } from "@/src/hooks/useConfidence"; // ← ADDED
 
 function StatCard({ icon: Icon, label, value, tone = "default" }) {
   const toneClasses =
@@ -341,8 +341,8 @@ export default function ExamPage() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [justActivated, setJustActivated] = useState(false);
 
-  // Change 2 — destructure recordAnswer from useStreak
- const { recordAnswer } = useStreak(profile?.id);
+  const { recordAnswer } = useStreak(profile?.id);
+  const { recordResult } = useConfidence(); // ← ADDED
 
   const isPremium =
     profile?.plan === "premium" || profile?.premium_status === "active";
@@ -821,7 +821,6 @@ export default function ExamPage() {
                       return (
                         <button
                           key={index}
-                          // Change 3 — record streak only on first answer to this question
                           onClick={() => {
                             if (!isPremium && currentIndex >= freePreviewCount) {
                               setLockReason("preview-limit");
@@ -829,15 +828,19 @@ export default function ExamPage() {
                               return;
                             }
 
-                              const isFirstAnswer =
-                                answers[currentIndex] === undefined;
+                            const isFirstAnswer =
+                              answers[currentIndex] === undefined;
 
-                              const isCorrect =
-                                option === currentQuestion.answer;
+                            const isCorrect =
+                              option === currentQuestion.answer;
 
-                              if (isFirstAnswer) {
-                                recordAnswer(isCorrect);
-                              }
+                            if (isFirstAnswer) {
+                              recordAnswer(isCorrect);
+                              recordResult( // ← ADDED
+                                currentQuestion.question,
+                                isCorrect ? "correct" : "wrong"
+                              );
+                            }
 
                             setAnswers((prev) => ({
                               ...prev,

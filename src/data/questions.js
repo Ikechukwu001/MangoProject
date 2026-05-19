@@ -1442,7 +1442,7 @@ const questions = [
 {
   paperId: "npce-pptp-2021",
   questions: [
-    { id: 1, question: "The full meaning of PCN is:", options: ["Pharmacy Council of Nigeria", "Pharmacists Council of Nigeria", "Pharmaceutical Company of Nigeria", "Pharmacist Committee of Nigeria"], answer: "Pharmacists Council of Nigeria" },
+    { id: 1, question: "The full meaning of PCN is:", options: ["Pharmacy Council of Nigeria", "Pharmacists Council of Nigeria", "Pharmaceutical Company of Nigeria", "Pharmacist Committee of Nigeria"], answer: "Pharmacy Council of Nigeria" },
     { id: 2, question: "The body responsible for regulating the practice of pharmacy in Nigeria is:", options: ["PSN", "PCN", "NAFDAC", "NDLEA"], answer: "PCN" },
     { id: 3, question: "Which of the following is NOT a function of NAFDAC?", options: ["Registration of drugs", "Regulation of food and cosmetics", "Licensing of pharmacy premises", "Control of imported drugs"], answer: "Licensing of pharmacy premises" },
     { id: 4, question: "NDLEA stands for:", options: ["Nigerian Drug Law Enforcement Agency", "National Drug Law Enforcement Agency", "National Drug Licensing and Enforcement Agency", "Nigerian Drug Licensing Enforcement Act"], answer: "National Drug Law Enforcement Agency" },
