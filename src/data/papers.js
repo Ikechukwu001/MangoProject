@@ -107,6 +107,42 @@ const papers = [
     "NPCE 2022 Pharmacy Technician Practice paper covering pharmacy law, drug regulation, dispensing procedures, stock management, ethics, hospital and community pharmacy practice.",
   isPremium: true,
 },
+ {
+    id: "npce-ana-2020",
+    title: "NPCE Anatomy & Physiology 2020",
+    subject: "Anatomy & Physiology",
+    year: 2020,
+    duration: 120,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2020 ANA paper covering cell biology, tissues, skeletal system, cardiovascular, respiratory, digestive, nervous, endocrine and reproductive systems.",
+    isPremium: true,
+  },
+  {
+    id: "npce-ana-2021",
+    title: "NPCE Anatomy & Physiology 2021",
+    subject: "Anatomy & Physiology",
+    year: 2021,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2021 ANA paper covering body organisation, blood, urinary system, senses, endocrine system, reproduction and homeostasis.",
+    isPremium: true,
+  },
+  {
+    id: "npce-ana-2022",
+    title: "NPCE Anatomy & Physiology 2022",
+    subject: "Anatomy & Physiology",
+    year: 2022,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2022 ANA paper covering tissues, musculoskeletal system, cardiovascular, respiratory, digestive, nervous, urinary and endocrine systems.",
+    isPremium: true,
+  },
 {
   id: "npce-pptp-2023",
   title: "NPCE Pharmacy Technician Practice 2023",
