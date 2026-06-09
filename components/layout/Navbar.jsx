@@ -11,6 +11,7 @@ import {
   BadgeCheck,
   AlertCircle,
   Zap,
+  BriefcaseBusiness,
 } from "lucide-react";
 
 import Container from "./Container";
@@ -25,6 +26,7 @@ const navLinks = [
   { name: "Streak", href: "/streak" },
   { name: "Insights", href: "/insights" },
   { name: "Confidence", href: "/confidence" },
+  { name: "Job Alerts", href: "/job-alerts", icon: BriefcaseBusiness },
 ];
 
 export default function Navbar() {
