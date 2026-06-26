@@ -371,6 +371,42 @@ const papers = [
       "NPCE 2023 BDT paper covering dispensing theory, dosage form identification, sterilisation, DRF operations, and prescription interpretation.",
     isPremium: true,
   },
+    {
+    id: "npce-ana-2023b",
+    title: "NPCE Anatomy & Physiology 2023 (Set B)",
+    subject: "Anatomy & Physiology",
+    year: 2023,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2023 ANA Set B covering body systems, cell biology, musculoskeletal, cardiovascular, digestive, urinary, nervous, endocrine and reproductive systems.",
+    isPremium: true,
+  },
+  {
+    id: "npce-ana-2024b",
+    title: "NPCE Anatomy & Physiology 2024 (Set B)",
+    subject: "Anatomy & Physiology",
+    year: 2024,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2024 ANA Set B covering tissues, blood, cardiovascular, respiratory, nervous, endocrine, reproductive, urinary and integumentary systems.",
+    isPremium: true,
+  },
+  {
+    id: "npce-ana-2025",
+    title: "NPCE Anatomy & Physiology 2025",
+    subject: "Anatomy & Physiology",
+    year: 2025,
+    duration: 105,
+    totalQuestions: 100,
+    freeQuestions: 10,
+    description:
+      "NPCE 2025 ANA paper covering body organisation, cell biology, tissues, all major body systems and homeostasis at NPCE standard.",
+    isPremium: true,
+  },
   {
     id: "npce-aum-2018",
     title: "NPCE Actions & Uses of Medicines 2018",
