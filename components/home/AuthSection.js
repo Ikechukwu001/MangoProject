@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Lottie from "lottie-react";
@@ -12,7 +13,6 @@ import accessAnimation from "@/public/lottie/Email.json";
 export default function AuthSection() {
   const supabase = createClient();
   const router = useRouter();
-
   const [currentUser, setCurrentUser] = useState(null);
   const [checkingUser, setCheckingUser] = useState(true);
   const [mode, setMode] = useState("signup");
@@ -60,9 +60,19 @@ export default function AuthSection() {
   }, [supabase, router]);
 
   const resetMessage = () => {
-    setMessage("");
-    setMessageType("default");
-  };
+  setMessage("");
+  setMessageType("default");
+   };
+
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get("mode") === "login") {
+    setMode("login");
+  }
+}, []);
 
   const handleGoogleSignIn = async () => {
     resetMessage();
@@ -119,7 +129,7 @@ export default function AuthSection() {
         return;
       }
 
-      setMessage("Check your email to confirm your account.");
+      setMessage(`Account created successfully! Check ${email} to verify your account before signing in.`);
       setMessageType("success");
       setMode("login");
       setPassword("");
@@ -133,11 +143,12 @@ export default function AuthSection() {
     });
 
     if (error) {
-      setMessage(error.message);
-      setMessageType("error");
-      setLoading(false);
-      return;
-    }
+  setMessage(error.message);
+  setMessageType("error");
+  setPassword("");
+  setLoading(false);
+  return;
+}
 
     router.push("/papers");
     router.refresh();
@@ -306,10 +317,11 @@ export default function AuthSection() {
                     <button
                       key={m}
                       type="button"
-                      onClick={() => {
-                        setMode(m);
-                        resetMessage();
-                      }}
+onClick={() => {
+    setMode(m);
+    resetMessage();
+    setPassword("");
+}}
                       style={{
                         flex: 1,
                         padding: "10px 0",
@@ -401,7 +413,8 @@ export default function AuthSection() {
                       <div>
                         <label style={labelStyle}>FULL NAME</label>
                         <input
-                          placeholder="Jane Smith"
+    autoComplete="name"
+    placeholder="Jane Smith"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           required
@@ -419,7 +432,8 @@ export default function AuthSection() {
                     <div>
                       <label style={labelStyle}>EMAIL</label>
                       <input
-                        type="email"
+    autoComplete="email"
+    type="email"
                         placeholder="jane@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -434,11 +448,45 @@ export default function AuthSection() {
                       />
                     </div>
 
-                    <div>
-                      <label style={labelStyle}>PASSWORD</label>
-                      <div style={{ position: "relative" }}>
+<div>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 6,
+    }}
+  >
+    <label style={{ ...labelStyle, marginBottom: 0 }}>
+      PASSWORD
+    </label>
+
+    {mode === "login" && (
+      <Link
+        href="/forgot-password"
+        onClick={resetMessage}
+        style={{
+          fontSize: 12,
+          color: "#14b8a6",
+          fontWeight: 500,
+          textDecoration: "none",
+          transition: "opacity .2s",
+        }}
+      >
+        Forgot Password?
+      </Link>
+    )}
+  </div>
+
+  <div style={{ position: "relative" }}>
+                        
                         <input
-                          type={showPassword ? "text" : "password"}
+    autoComplete={
+      mode === "login"
+        ? "current-password"
+        : "new-password"
+    }
+    type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
@@ -568,10 +616,11 @@ export default function AuthSection() {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      setMode(mode === "signup" ? "login" : "signup");
-                      resetMessage();
-                    }}
+onClick={() => {
+    setMode(mode === "signup" ? "login" : "signup");
+    resetMessage();
+    setPassword("");
+}}
                     style={{
                       background: "none",
                       border: "none",
