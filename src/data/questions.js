@@ -318,12 +318,14 @@ const questions = [
     ],
   },
    {
-    paperId: "npce-eng-2021",
-    questions: [
+  paperId: "npce-eng-2021",
+  passage: "Bats are the only mammals capable of true, sustained flight, and they exist in two broad categories. Despite common fears about them, the majority of the bat population feeds on a diet of insects, making bats extremely useful to farmers and to man in general. In some areas, the insect population of the world is kept at a normal level because bats eat these insects in large numbers every night. Unfortunately, the bat is a widely misunderstood animal because its value as a natural enemy of insects is not generally known. In the West, bats have long been linked with fear and superstition, partly because a small number of bats — known as vampire bats — feed on the blood of other animals and are capable of transmitting diseases such as rabies to any animal or person they bite.",
+  questions: [
       { id: 1, question: "The majority of the bat population ___.", options: ["are vampires", "transmit many illnesses", "feed on a diet of insects", "are dangerous to man"], answer: "feed on a diet of insects" },
       { id: 2, question: "According to the passage the bat is misunderstood because ___.", options: ["it is capable of transmitting rabies", "it has been associated with fear in the west", "its value as a natural enemy of insects is not generally known", "it is the only flying mammal"], answer: "its value as a natural enemy of insects is not generally known" },
       { id: 3, question: "The insect population of the world ___.", options: ["is increased by bats", "represents fear and terror to bats of the east", "is eaten by vampire bats", "is maintained at normal levels because bats eat them, in certain areas"], answer: "is maintained at normal levels because bats eat them, in certain areas" },
       { id: 4, question: "Vampire bats are capable of transmitting:", options: ["Rabies", "Fear", "Terror", "Hunger"], answer: "Rabies" },
+      { id: 5, question: "Bats are of ___ categories:", options: ["Vampire", "Flying mammals", "Dangerous", "East"], answer: "Flying mammals" },
       { id: 5, question: "Bats are of ___ categories:", options: ["Vampire", "Flying mammals", "Dangerous", "East"], answer: "Flying mammals" },
       { id: 6, question: "Two dozens of cows ___ lying peacefully in the shade.", options: ["were", "was", "has been", "is"], answer: "were" },
       { id: 7, question: "The Town Council ___ against raising the rents of its houses.", options: ["are", "were", "is", "aren't"], answer: "is" },
