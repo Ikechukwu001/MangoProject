@@ -132,8 +132,7 @@ export default function ContactPage() {
                   </p>
 
                   <h2 className="mt-1.5 text-base font-semibold text-slate-900 sm:mt-2 sm:text-xl">
-                    +234 815 790 2426
-                  </h2>
+                    +234 906 047 3646                  </h2>
                 </div>
 
                 <ArrowUpRight className="shrink-0 text-slate-400 transition group-hover:text-emerald-600" size={20} />
