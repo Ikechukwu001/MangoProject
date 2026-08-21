@@ -22,8 +22,7 @@ import Container from "@/components/layout/Container";
 import getPaperById from "@/lib/getPaperById";
 import questions from "@/src/data/questions";
 import { createClient } from "@/src/lib/supabase/client";
-import { useStreak } from "@/src/hooks/useStreak";
-import { useConfidence } from "@/src/hooks/useConfidence"; // ← ADDED
+import { useConfidence } from "@/src/hooks/useConfidence";
 
 function StatCard({ icon: Icon, label, value, tone = "default" }) {
   const toneClasses =
@@ -341,8 +340,7 @@ export default function ExamPage() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [justActivated, setJustActivated] = useState(false);
 
-  const { recordAnswer } = useStreak(profile?.id);
-  const { recordResult } = useConfidence(); // ← ADDED
+  const { recordResult } = useConfidence();
 
   const isPremium =
     profile?.plan === "premium" || profile?.premium_status === "active";
@@ -361,9 +359,9 @@ export default function ExamPage() {
     }
   }, [isPremium]);
 
+  // Load the user + their profile once on mount.
   useEffect(() => {
     let mounted = true;
-    let profileChannel = null;
 
     async function loadAuth() {
       const {
@@ -387,49 +385,49 @@ export default function ExamPage() {
 
       setProfile(profileData || null);
       setAuthLoading(false);
-
-      profileChannel = supabase
-        .channel(`profile-live-${user.id}`)
-        .on(
-          "postgres_changes",
-          {
-            event: "UPDATE",
-            schema: "public",
-            table: "profiles",
-            filter: `id=eq.${user.id}`,
-          },
-          (payload) => {
-            const updatedProfile = payload.new;
-
-            const becamePremium =
-              updatedProfile?.plan === "premium" ||
-              updatedProfile?.premium_status === "active";
-
-            setProfile((prev) => ({
-              ...prev,
-              ...updatedProfile,
-            }));
-
-            if (becamePremium) {
-              setJustActivated(true);
-              setTimeout(() => {
-                setJustActivated(false);
-              }, 4000);
-            }
-          }
-        )
-        .subscribe();
     }
 
     loadAuth();
 
     return () => {
       mounted = false;
-      if (profileChannel) {
-        supabase.removeChannel(profileChannel);
-      }
     };
   }, [supabase, router]);
+
+  // Poll for premium upgrades instead of a live Realtime subscription.
+  // A live "postgres_changes" channel per exam session was the single
+  // biggest Disk IO consumer on the Supabase project (realtime.list_changes).
+  // Polling every 25s catches an in-exam upgrade just as well, at a tiny
+  // fraction of the cost, and uses zero Realtime/WebSocket connections.
+  useEffect(() => {
+    if (!profile?.id) return;
+
+    const pollInterval = setInterval(async () => {
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("id, email, full_name, plan, premium_status")
+        .eq("id", profile.id)
+        .maybeSingle();
+
+      if (!profileData) return;
+
+      const becamePremium =
+        profileData.plan === "premium" ||
+        profileData.premium_status === "active";
+
+      const wasPremium =
+        profile.plan === "premium" || profile.premium_status === "active";
+
+      setProfile((prev) => ({ ...prev, ...profileData }));
+
+      if (becamePremium && !wasPremium) {
+        setJustActivated(true);
+        setTimeout(() => setJustActivated(false), 4000);
+      }
+    }, 25000); // every 25 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [profile?.id, profile?.plan, profile?.premium_status, supabase]);
 
   useEffect(() => {
     if (!paperId) return;
@@ -835,8 +833,7 @@ export default function ExamPage() {
                               option === currentQuestion.answer;
 
                             if (isFirstAnswer) {
-                              recordAnswer(isCorrect);
-                              recordResult( // ← ADDED
+                              recordResult(
                                 currentQuestion.question,
                                 isCorrect ? "correct" : "wrong"
                               );

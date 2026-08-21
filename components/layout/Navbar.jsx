@@ -16,14 +16,12 @@ import {
 
 import Container from "./Container";
 import useUserProfile from "@/src/hooks/useUserProfile";
-import { useStreak } from "@/src/hooks/useStreak";
 
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Papers", href: "/papers" },
   { name: "Pricing", href: "/pricing" },
   { name: "Contact", href: "/contact" },
-  { name: "Streak", href: "/streak" },
   { name: "Insights", href: "/insights" },
   { name: "Confidence", href: "/confidence" },
   { name: "Job Alerts", href: "/job-alerts", icon: BriefcaseBusiness },
@@ -32,9 +30,7 @@ const navLinks = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-
   const { user, loading, isPremium, isPending } = useUserProfile();
-  const { streak } = useStreak(user?.id);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -168,53 +164,23 @@ export default function Navbar() {
                   </Link>
                 </>
               ) : isPremium ? (
-                <>
-            <Link
-              href="/streak"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              🔥 {streak?.current_streak ?? 0}
-              <span className="text-slate-400 font-normal">day streak</span>
-            </Link>
-
-                  <div className="inline-flex items-center gap-2 rounded-xl bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-700">
-                    <BadgeCheck size={16} />
-                    Premium Active
-                  </div>
-                </>
+                <div className="inline-flex items-center gap-2 rounded-xl bg-teal-50 px-4 py-2.5 text-sm font-semibold text-teal-700">
+                  <BadgeCheck size={16} />
+                  Premium Active
+                </div>
               ) : isPending ? (
-                <>
-            <Link
-              href="/streak"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              🔥 {streak?.current_streak ?? 0}
-              <span className="text-slate-400 font-normal">day streak</span>
-            </Link>
-
-                  <div className="inline-flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700">
-                    <AlertCircle size={16} />
-                    Pending Review
-                  </div>
-                </>
+                <div className="inline-flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700">
+                  <AlertCircle size={16} />
+                  Pending Review
+                </div>
               ) : (
-                <>
-            <Link
-              href="/streak"
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              🔥 {streak?.current_streak ?? 0}
-              <span className="text-slate-400 font-normal">day streak</span>
-            </Link>
-
-                  <Link
-                    href="/pricing"
-                    className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-amber-200 transition hover:bg-amber-600"
-                  >
-                    <Crown size={15} />
-                    Upgrade
-                  </Link>
-                </>
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-amber-200 transition hover:bg-amber-600"
+                >
+                  <Crown size={15} />
+                  Upgrade
+                </Link>
               )}
             </div>
 
@@ -289,34 +255,14 @@ export default function Navbar() {
             </Link>
           </div>
         ) : isPremium ? (
-          <div className="flex flex-col gap-3">
-            <Link
-              href="/streak"
-              onClick={closeMenu}
-              className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Streak
-            </Link>
-
-            <div className="rounded-2xl bg-teal-50 px-4 py-3 text-center text-sm font-semibold text-teal-700">
-              <BadgeCheck size={15} className="mr-1 inline" />
-              Premium Active
-            </div>
+          <div className="rounded-2xl bg-teal-50 px-4 py-3 text-center text-sm font-semibold text-teal-700">
+            <BadgeCheck size={15} className="mr-1 inline" />
+            Premium Active
           </div>
         ) : isPending ? (
-          <div className="flex flex-col gap-3">
-            <Link
-              href="/streak"
-              onClick={closeMenu}
-              className="rounded-2xl border border-slate-200 px-4 py-3 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Streak
-            </Link>
-
-            <div className="rounded-2xl bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-amber-700">
-              <AlertCircle size={15} className="mr-1 inline" />
-              Premium Pending
-            </div>
+          <div className="rounded-2xl bg-amber-50 px-4 py-3 text-center text-sm font-semibold text-amber-700">
+            <AlertCircle size={15} className="mr-1 inline" />
+            Premium Pending
           </div>
         ) : (
           <div className="flex flex-col gap-3">
