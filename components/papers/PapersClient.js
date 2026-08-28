@@ -11,6 +11,7 @@ import PapersEmptyState from "@/components/papers/PapersEmptyState";
 import papers from "@/src/data/papers";
 import useUserProfile from "@/src/hooks/useUserProfile";
 import { Crown, AlertCircle, BadgeCheck, Sparkles } from "lucide-react";
+import PrecouncilCountdown from "@/components/papers/PrecouncilCountdown";
 
 export default function PapersClient() {
   const router = useRouter();
@@ -111,6 +112,8 @@ export default function PapersClient() {
             </div>
           </div>
         </div>
+
+        <PrecouncilCountdown />
 
         {/* Status info card */}
         {!isPremium && (
