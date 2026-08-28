@@ -2,91 +2,80 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Container from "@/components/layout/Container";
 import SectionTitle from "@/components/common/SectionTitle";
 import PaperCard from "@/components/papers/PaperCard";
 import PaperFilter from "@/components/papers/PaperFilter";
 import PapersEmptyState from "@/components/papers/PapersEmptyState";
 import papers from "@/src/data/papers";
-import { createClient } from "@/src/lib/supabase/client";
+import useUserProfile from "@/src/hooks/useUserProfile";
 import { Crown, AlertCircle, BadgeCheck, Sparkles } from "lucide-react";
 
-export default function PapersClient({ user }) {
-  const supabase = createClient();
-
-  const [profile, setProfile] = useState(null);
-  const [profileLoading, setProfileLoading] = useState(true);
+export default function PapersClient() {
+  const router = useRouter();
+  const { user, profile, loading, isPremium, isPending } = useUserProfile();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
 
   useEffect(() => {
-    let mounted = true;
-
-    async function loadProfile() {
-      if (!user?.id) {
-        setProfileLoading(false);
-        return;
-      }
-
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, email, full_name, plan, premium_status")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (!mounted) return;
-
-      setProfile(data || null);
-      setProfileLoading(false);
+    if (!loading && !user) {
+      router.push("/");
     }
+  }, [loading, user, router]);
 
-    loadProfile();
-
-    return () => {
-      mounted = false;
-    };
-  }, [supabase, user]);
-
-  const isPremium =
-    profile?.plan === "premium" || profile?.premium_status === "active";
-
-  const isPending = profile?.premium_status === "pending";
-
-    const subjects = [
+  const subjects = [
     ...new Set(papers.map((paper) => paper.subject).filter(Boolean)),
-    ];
+  ];
 
-    const years = [
+  const years = [
     ...new Set(papers.map((paper) => paper.year).filter(Boolean)),
-    ].sort((a, b) => b - a);
+  ].sort((a, b) => b - a);
 
   const filteredPapers = useMemo(() => {
-  const normalizedSearch = searchTerm.toLowerCase().trim();
+    const normalizedSearch = searchTerm.toLowerCase().trim();
 
-  return papers.filter((paper) => {
-    const title = (paper.title || "").toLowerCase();
-    const subject = (paper.subject || "").toLowerCase();
-    const year = String(paper.year || "");
+    return papers.filter((paper) => {
+      const title = (paper.title || "").toLowerCase();
+      const subject = (paper.subject || "").toLowerCase();
+      const year = String(paper.year || "");
 
-    const matchesSearch =
-      title.includes(normalizedSearch) || subject.includes(normalizedSearch);
+      const matchesSearch =
+        title.includes(normalizedSearch) || subject.includes(normalizedSearch);
 
-    const matchesSubject =
-      subjectFilter === "all" || paper.subject === subjectFilter;
+      const matchesSubject =
+        subjectFilter === "all" || paper.subject === subjectFilter;
 
-    const matchesYear =
-      yearFilter === "all" || year === String(yearFilter);
+      const matchesYear = yearFilter === "all" || year === String(yearFilter);
 
-    return matchesSearch && matchesSubject && matchesYear;
-  });
-}, [searchTerm, subjectFilter, yearFilter]);
+      return matchesSearch && matchesSubject && matchesYear;
+    });
+  }, [searchTerm, subjectFilter, yearFilter]);
 
   function resetFilters() {
     setSearchTerm("");
     setSubjectFilter("all");
     setYearFilter("all");
+  }
+
+  // Loading skeleton while we check auth — avoids a flash of the wrong state.
+  if (loading || !user) {
+    return (
+      <main className="min-h-screen bg-slate-50 py-16 sm:py-20">
+        <Container>
+          <div className="animate-pulse space-y-6">
+            <div className="h-20 rounded-2xl bg-slate-100" />
+            <div className="h-10 w-72 rounded bg-slate-100" />
+            <div className="grid gap-6 lg:grid-cols-2">
+              <div className="h-40 rounded-3xl bg-slate-100" />
+              <div className="h-40 rounded-3xl bg-slate-100" />
+            </div>
+          </div>
+        </Container>
+      </main>
+    );
   }
 
   return (
@@ -104,11 +93,7 @@ export default function PapersClient({ user }) {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              {profileLoading ? (
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
-                  Checking plan...
-                </span>
-              ) : isPremium ? (
+              {isPremium ? (
                 <span className="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-700">
                   <BadgeCheck size={14} />
                   Premium Active
@@ -128,7 +113,7 @@ export default function PapersClient({ user }) {
         </div>
 
         {/* Status info card */}
-        {!profileLoading && !isPremium && (
+        {!isPremium && (
           <div
             className={`mb-8 rounded-3xl border p-5 shadow-sm ${
               isPending

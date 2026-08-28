@@ -1,18 +1,10 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/src/lib/supabase/server";
 import PapersClient from "@/components/papers/PapersClient";
 
-export default async function PapersPage() {
-  const supabase = await createClient();
+// No cookies()/auth on the server anymore, so this route can be statically
+// generated and served from cache instead of running a function per visit.
+// PapersClient now handles its own auth check + redirect client-side.
+export const revalidate = 3600;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // ❌ Not logged in → redirect home
-  if (!user) {
-    redirect("/");
-  }
-
-  return <PapersClient user={user} />;
+export default function PapersPage() {
+  return <PapersClient />;
 }
