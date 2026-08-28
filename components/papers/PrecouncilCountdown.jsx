@@ -49,13 +49,13 @@ export default function PrecouncilCountdown() {
       <div className="flex flex-col items-center text-center">
         <div className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-teal-700">
           <CalendarClock size={12} />
-          Precouncil Examination
+          Council Examination
         </div>
 
         {timeLeft ? (
           <>
             <h2 className="mt-3 text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
-              Countdown to Precouncil
+              Countdown to Council
             </h2>
             <p className="mt-1 text-sm text-slate-500">
               Wednesday, September 2, 2026 · 11:00 AM
@@ -74,7 +74,7 @@ export default function PrecouncilCountdown() {
         ) : (
           <>
             <h2 className="mt-3 text-lg font-bold tracking-tight text-teal-700 sm:text-xl">
-              Precouncil is underway
+              Cuncil is underway
             </h2>
             <p className="mt-1 text-sm text-slate-500">
               Good luck — you've got this.
