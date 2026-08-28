@@ -17,6 +17,7 @@ import {
   Sparkles,
   X,
   BadgeCheck,
+  Loader2,
 } from "lucide-react";
 import Container from "@/components/layout/Container";
 import getPaperById from "@/lib/getPaperById";
@@ -84,6 +85,7 @@ function SubmitModal({
   accessibleCount,
   paperQuestionsLength,
   previewMode,
+  isSubmitting,
 }) {
   return (
     <ModalShell open={open} onClose={onClose} maxWidth="max-w-2xl">
@@ -173,7 +175,8 @@ function SubmitModal({
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 sm:min-h-12"
+            disabled={isSubmitting}
+            className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60 sm:min-h-12"
           >
             Continue Exam
           </button>
@@ -181,9 +184,19 @@ function SubmitModal({
           <button
             type="button"
             onClick={onSubmit}
-            className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 sm:min-h-12"
+            disabled={isSubmitting}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70 sm:min-h-12"
           >
-            {isPremium ? "Submit Exam Now" : "Submit Preview Now"}
+            {isSubmitting ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Submitting...
+              </>
+            ) : isPremium ? (
+              "Submit Exam Now"
+            ) : (
+              "Submit Preview Now"
+            )}
           </button>
         </div>
       </div>
@@ -320,7 +333,6 @@ export default function ExamPage() {
     index: `index-${paperId}`,
     time: `time-${paperId}`,
     flagged: `flagged-${paperId}`,
-    submitted: `submitted-${paperId}`,
     result: `result-${paperId}`,
   };
 
@@ -331,6 +343,7 @@ export default function ExamPage() {
   const [flaggedQuestions, setFlaggedQuestions] = useState([]);
   const [timeLeft, setTimeLeft] = useState(DEFAULT_EXAM_TIME);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const [authLoading, setAuthLoading] = useState(true);
   const [profile, setProfile] = useState(null);
@@ -531,7 +544,6 @@ export default function ExamPage() {
     localStorage.removeItem(STORAGE_KEYS.index);
     localStorage.removeItem(STORAGE_KEYS.time);
     localStorage.removeItem(STORAGE_KEYS.flagged);
-    localStorage.removeItem(STORAGE_KEYS.submitted);
   };
 
   const buildResultData = () => {
@@ -584,20 +596,32 @@ export default function ExamPage() {
     };
   };
 
+  // Wrapped in try/catch: localStorage.setItem can throw (Safari Private
+  // Browsing, storage quota exceeded, etc). Previously an uncaught error
+  // here left isSubmitting stuck at true forever, silently freezing the
+  // Submit button with no feedback — this is what was reported as
+  // "unable to submit" across all papers.
   const handleSubmit = () => {
     if (isSubmitting) return;
 
     setShowSubmitModal(false);
     setIsSubmitting(true);
+    setSubmitError(null);
 
-    const resultData = buildResultData();
+    try {
+      const resultData = buildResultData();
 
-    localStorage.setItem(STORAGE_KEYS.result, JSON.stringify(resultData));
-    localStorage.setItem(STORAGE_KEYS.submitted, "true");
+      localStorage.setItem(STORAGE_KEYS.result, JSON.stringify(resultData));
+      clearExamStorage();
 
-    clearExamStorage();
-
-    router.push(`/result/${paperId}`);
+      router.push(`/result/${paperId}`);
+    } catch (err) {
+      console.error("Exam submit failed:", err);
+      setIsSubmitting(false);
+      setSubmitError(
+        "We couldn't save your result on this device. If you're using Private/Incognito browsing, please switch to normal browsing mode and try submitting again."
+      );
+    }
   };
 
   const handleNext = () => {
@@ -722,6 +746,24 @@ export default function ExamPage() {
                     <p className="mt-1 text-sm text-teal-700">
                       Your account now has full access to this paper. Continue
                       your exam without limits.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {submitError && (
+              <div className="rounded-3xl border border-red-200 bg-red-50 p-4 shadow-sm sm:p-5">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-red-100 text-red-700">
+                    <AlertCircle size={18} />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-red-800">
+                      Couldn't submit your exam
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-red-700">
+                      {submitError}
                     </p>
                   </div>
                 </div>
@@ -899,9 +941,19 @@ export default function ExamPage() {
 
                 <button
                   onClick={() => setShowSubmitModal(true)}
-                  className="inline-flex min-h-12 w-full items-center justify-center rounded-2xl bg-slate-900 px-5 py-4 text-base font-semibold text-white transition hover:bg-slate-800"
+                  disabled={isSubmitting}
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-4 text-base font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {isPremium ? "Submit Exam" : "Submit Free Preview"}
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      Submitting...
+                    </>
+                  ) : isPremium ? (
+                    "Submit Exam"
+                  ) : (
+                    "Submit Free Preview"
+                  )}
                 </button>
               </div>
 
@@ -1114,6 +1166,7 @@ export default function ExamPage() {
         accessibleCount={accessibleCount}
         paperQuestionsLength={paperQuestions.length}
         previewMode={!isPremium}
+        isSubmitting={isSubmitting}
       />
 
       <PremiumModal
