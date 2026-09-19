@@ -74,10 +74,10 @@ export default function PrecouncilCountdown() {
         ) : (
           <>
             <h2 className="mt-3 text-lg font-bold tracking-tight text-teal-700 sm:text-xl">
-              Cuncil is underway
+              Council Examination Is Yet to Begin For This New Session. Please Stay Tuned For Updates.
             </h2>
             <p className="mt-1 text-sm text-slate-500">
-              Good luck — you've got this.
+              Before the council examination begins, you can still prepare by reviewing past papers and studying relevant materials. Make sure to check back for the official start time and any announcements regarding the examination.
             </p>
           </>
         )}
