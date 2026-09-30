@@ -1,57 +1,61 @@
 // app/api/paystack/initialize/route.js
 import { NextResponse } from "next/server";
-import { createClient } from "@/src/lib/supabase/server";
+import { and, desc, eq } from "drizzle-orm";
+import { db, profiles, premiumRequests } from "@/db";
+import { getSession } from "@/lib/session";
+import { PREMIUM_PRICE_KOBO, PREMIUM_PRICE_NAIRA } from "@/lib/paystack";
 
-const PREMIUM_PRICE_KOBO = 300000; // ₦3,000 in kobo
-
-export async function POST(request) {
+export async function POST() {
   try {
-    const supabase = await createClient(); // ← was missing await
+    const session = await getSession();
 
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if already premium
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("plan, premium_status, full_name")
-      .eq("id", user.id)
-      .maybeSingle();
+    const { user } = session;
 
-    if (profile?.plan === "premium" || profile?.premium_status === "active") {
+    // Check if already premium
+    const [profile] = await db
+      .select({
+        plan: profiles.plan,
+        premiumStatus: profiles.premiumStatus,
+        fullName: profiles.fullName,
+      })
+      .from(profiles)
+      .where(eq(profiles.id, user.id))
+      .limit(1);
+
+    if (profile?.plan?.trim() === "premium" || profile?.premiumStatus === "active") {
       return NextResponse.json(
         { error: "Account already has premium access" },
         { status: 400 }
       );
     }
 
-    // Check for existing pending Paystack request to avoid duplicates
-    const { data: existingRequest } = await supabase
-      .from("premium_requests")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("status", "pending")
-      .eq("payment_method", "paystack")
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    // Reuse an existing pending Paystack checkout to avoid duplicates
+    const [existingRequest] = await db
+      .select()
+      .from(premiumRequests)
+      .where(
+        and(
+          eq(premiumRequests.userId, user.id),
+          eq(premiumRequests.status, "pending"),
+          eq(premiumRequests.paymentMethod, "paystack")
+        )
+      )
+      .orderBy(desc(premiumRequests.createdAt))
+      .limit(1);
 
-    if (existingRequest?.paystack_access_code) {
+    if (existingRequest?.paystackAccessCode) {
       return NextResponse.json({
-        authorization_url: existingRequest.paystack_authorization_url,
-        access_code: existingRequest.paystack_access_code,
+        authorization_url: existingRequest.paystackAuthorizationUrl,
+        access_code: existingRequest.paystackAccessCode,
         reference: existingRequest.reference,
       });
     }
 
-    const fullName =
-      profile?.full_name || user.user_metadata?.full_name || "Student";
+    const fullName = profile?.fullName || user.name || "Student";
 
     // Initialize transaction with Paystack
     const paystackResponse = await fetch(
@@ -94,31 +98,28 @@ export async function POST(request) {
 
     const { authorization_url, access_code, reference } = paystackData.data;
 
-    // Save pending request to Supabase
-    await supabase.from("premium_requests").insert({
-      user_id: user.id,
+    // Save the pending request
+    await db.insert(premiumRequests).values({
+      userId: user.id,
       email: user.email,
-      full_name: fullName,
-      amount: 3000,
+      fullName,
+      amount: PREMIUM_PRICE_NAIRA,
       reference,
       status: "pending",
-      payment_method: "paystack",
-      paystack_access_code: access_code,
-      paystack_authorization_url: authorization_url,
+      paymentMethod: "paystack",
+      paystackAccessCode: access_code,
+      paystackAuthorizationUrl: authorization_url,
     });
 
     // Mark profile as pending
-    await supabase
-      .from("profiles")
-      .update({ premium_status: "pending" })
-      .eq("id", user.id);
+    await db
+      .update(profiles)
+      .set({ premiumStatus: "pending" })
+      .where(eq(profiles.id, user.id));
 
     return NextResponse.json({ authorization_url, access_code, reference });
   } catch (error) {
     console.error("Initialize payment error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

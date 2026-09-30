@@ -11,10 +11,9 @@ import {
 } from "lucide-react";
 
 import Container from "@/components/layout/Container";
-import { createClient } from "@/src/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 
 export default function ForgotPasswordPage() {
-  const supabase = createClient();
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,9 +40,10 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setMessage("");
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
-    });
+    const { error } = await authClient.requestPasswordReset({
+    email,
+    redirectTo: "/reset-password",
+  });
 
     setLoading(false);
 

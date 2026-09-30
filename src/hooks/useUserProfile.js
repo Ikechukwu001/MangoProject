@@ -1,66 +1,60 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClient } from "@/src/lib/supabase/client";
+import { useCallback, useEffect, useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 export default function useUserProfile() {
-  const supabase = createClient();
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user ?? null;
+  const userId = user?.id ?? null;
 
-  const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [tick, setTick] = useState(0);
+
+  const refresh = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
-    let mounted = true;
+    if (isPending) return;
 
-    async function load() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!mounted) return;
-
-      setUser(user ?? null);
-
-      if (user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("id, email, full_name, plan, premium_status")
-          .eq("id", user.id)
-          .maybeSingle();
-
-        if (!mounted) return;
-        setProfile(data || null);
-      }
-
-      setLoading(false);
+    if (!userId) {
+      setProfile(null);
+      setLoadingProfile(false);
+      return;
     }
 
-    load();
+    let mounted = true;
+    setLoadingProfile(true);
 
-    // 🔥 auto refresh when auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      load();
-    });
+    fetch("/api/me", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!mounted) return;
+        setProfile(data?.profile ?? null);
+        setLoadingProfile(false);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setProfile(null);
+        setLoadingProfile(false);
+      });
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [isPending, userId, tick]);
 
+  const loading = isPending || loadingProfile;
   const isPremium =
     profile?.plan === "premium" || profile?.premium_status === "active";
-
-  const isPending = profile?.premium_status === "pending";
+  const isPending_ = profile?.premium_status === "pending";
 
   return {
     user,
     profile,
     loading,
     isPremium,
-    isPending,
+    isPending: isPending_,
+    refresh,
   };
 }

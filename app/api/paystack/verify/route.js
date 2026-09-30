@@ -1,6 +1,6 @@
 // app/api/paystack/verify/route.js
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { activatePremium } from "@/lib/paystack";
 
 export async function GET(request) {
   try {
@@ -8,19 +8,14 @@ export async function GET(request) {
     const reference = searchParams.get("reference");
 
     if (!reference) {
-      return NextResponse.json(
-        { error: "No reference provided" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "No reference provided" }, { status: 400 });
     }
 
-    // Verify with Paystack
+    // Ask Paystack directly whether this payment really succeeded
     const paystackResponse = await fetch(
-      `https://api.paystack.co/transaction/verify/${reference}`,
+      `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
       {
-        headers: {
-          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
-        },
+        headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}` },
       }
     );
 
@@ -36,67 +31,36 @@ export async function GET(request) {
       );
     }
 
-    const { metadata, amount } = paystackData.data;
-    const userId = metadata?.user_id;
+    const { metadata, amount, currency } = paystackData.data;
 
-    if (!userId) {
+    // The Paystack account is shared with NurseAssist. Never activate for its payments.
+    if (metadata?.product === "nurseassist" || currency !== "NGN") {
       return NextResponse.json(
-        { error: "Missing user_id in payment metadata" },
+        { error: "This payment does not belong to PharmTechSuccess" },
         { status: 400 }
       );
     }
 
-    // Use service role key — bypasses RLS so updates always work
-    // even when there is no user session (server-side redirect)
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const result = await activatePremium({
+      reference,
+      userId: metadata?.user_id,
+      amountKobo: amount,
+    });
 
-    // Idempotency: check if already activated
-    const { data: existingRequest } = await supabase
-      .from("premium_requests")
-      .select("status")
-      .eq("reference", reference)
-      .maybeSingle();
-
-    if (existingRequest?.status === "approved") {
-      return NextResponse.json({ success: true, already_activated: true });
+    if (!result.ok) {
+      console.error("Verify: could not activate", reference, result.reason);
+      return NextResponse.json(
+        { error: "We could not activate your account. Please contact support." },
+        { status: 400 }
+      );
     }
 
-    // Update premium_requests to approved
-    const { error: requestError } = await supabase
-      .from("premium_requests")
-      .update({
-        status: "approved",
-        paid_at: new Date().toISOString(),
-        paystack_amount_paid: amount / 100,
-      })
-      .eq("reference", reference);
-
-    if (requestError) {
-      console.error("Failed to update premium_requests:", requestError);
-    }
-
-    // Upgrade the profile
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .update({
-        plan: "premium",
-        premium_status: "active",
-      })
-      .eq("id", userId);
-
-    if (profileError) {
-      console.error("Failed to update profile:", profileError);
-    }
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      already_activated: result.alreadyActivated || false,
+    });
   } catch (error) {
     console.error("Verify payment error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

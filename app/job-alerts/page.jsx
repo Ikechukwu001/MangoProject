@@ -3,7 +3,6 @@
 
 import JobsList from "@/components/jobs/JobsList";
 import useUserProfile from "@/src/hooks/useUserProfile";
-import { createClient } from "@/src/lib/supabase/client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Lock, Briefcase, Zap } from "lucide-react";
@@ -18,18 +17,19 @@ export default function JobAlertsPage() {
   const [jobs, setJobs] = useState([]);
   const [fetching, setFetching] = useState(true);
 
-  useEffect(() => {
+    useEffect(() => {
     if (!isPremium) {
       setFetching(false);
       return;
     }
     async function fetchJobs() {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("job_alerts")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (!error) setJobs(data || []);
+      try {
+        const res = await fetch("/api/job-alerts", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          setJobs(data.jobs || []);
+        }
+      } catch {}
       setFetching(false);
     }
     fetchJobs();

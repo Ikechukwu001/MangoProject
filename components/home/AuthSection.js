@@ -7,14 +7,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import Lottie from "lottie-react";
 import { Eye, EyeOff, ArrowRight, LogOut, Sparkles } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { createClient } from "@/src/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 import accessAnimation from "@/public/lottie/Email.json";
 
 export default function AuthSection() {
-  const supabase = createClient();
   const router = useRouter();
-  const [currentUser, setCurrentUser] = useState(null);
-  const [checkingUser, setCheckingUser] = useState(true);
+  const { data: session, isPending: checkingUser } = authClient.useSession();
+  const currentUser = session?.user ?? null;
+
   const [mode, setMode] = useState("signup");
   const [showPassword, setShowPassword] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -26,74 +26,33 @@ export default function AuthSection() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("default");
 
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (mounted) {
-        setCurrentUser(user ?? null);
-        setCheckingUser(false);
-      }
-    }
-
-    loadUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setCurrentUser(session?.user ?? null);
-      setCheckingUser(false);
-
-      if (session?.user) {
-        router.refresh();
-      }
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, [supabase, router]);
-
   const resetMessage = () => {
-  setMessage("");
-  setMessageType("default");
-   };
+    setMessage("");
+    setMessageType("default");
+  };
 
-useEffect(() => {
-  if (typeof window === "undefined") return;
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-  const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
 
-  if (params.get("mode") === "login") {
-    setMode("login");
-  }
-}, []);
+    if (params.get("mode") === "login") {
+      setMode("login");
+    }
+  }, []);
 
   const handleGoogleSignIn = async () => {
     resetMessage();
     setGoogleLoading(true);
 
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await authClient.signIn.social({
       provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/papers`, // ✅ Fix 2
-        queryParams: {
-          access_type: "offline",
-          prompt: "consent",
-        },
-      },
+      callbackURL: "/papers",
     });
 
     if (error) {
       console.error("Google sign in error:", error);
-      setMessage(
-        error.message || "Google sign in failed. Check Supabase redirect URLs."
-      );
+      setMessage(error.message || "Google sign in failed. Please try again.");
       setMessageType("error");
       setGoogleLoading(false);
     }
@@ -105,30 +64,28 @@ useEffect(() => {
     setLoading(true);
 
     if (mode === "signup") {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await authClient.signUp.email({
+        name: fullName,
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/papers`, // ✅ Fix 2
-          data: {
-            full_name: fullName,
-          },
-        },
+        callbackURL: "/papers",
       });
 
       if (error) {
-        setMessage(error.message);
+        setMessage(error.message || "Could not create your account.");
         setMessageType("error");
         setLoading(false);
         return;
       }
 
-      if (data?.session) {
+      // Signed in straight away
+      if (data?.token) {
         router.push("/papers");
         router.refresh();
         return;
       }
 
+      // Email verification is switched on: ask them to check their inbox
       setMessage(`Account created successfully! Check ${email} to verify your account before signing in.`);
       setMessageType("success");
       setMode("login");
@@ -137,24 +94,29 @@ useEffect(() => {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await authClient.signIn.email({
       email,
       password,
     });
 
     if (error) {
-  setMessage(error.message);
-  setMessageType("error");
-  setPassword("");
-  setLoading(false);
-  return;
-}
+      setMessage(
+        error.status === 403
+          ? "Please confirm your email first. We just sent you a new confirmation link."
+          : error.message || "Could not sign you in."
+      );
+      setMessageType("error");
+      setPassword("");
+      setLoading(false);
+      return;
+    }
 
     router.push("/papers");
     router.refresh();
   };
 
   if (checkingUser) return null;
+
 
   return (
     <section
@@ -707,10 +669,9 @@ onClick={() => {
                 <button
                   type="button"
                   onClick={async () => {
-                    await supabase.auth.signOut();
-                    setCurrentUser(null);
-                    router.refresh();
-                  }}
+                  await authClient.signOut();
+                  router.refresh();
+                }}
                   style={{
                     width: "100%",
                     padding: "12px 0",

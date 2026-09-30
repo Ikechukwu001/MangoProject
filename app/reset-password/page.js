@@ -15,10 +15,9 @@ import {
 } from "lucide-react";
 
 import Container from "@/components/layout/Container";
-import { createClient } from "@/src/lib/supabase/client";
+import { authClient } from "@/lib/auth-client";
 
 export default function ResetPasswordPage() {
-  const supabase = createClient();
   const router = useRouter();
 
   const [password, setPassword] = useState("");
@@ -31,46 +30,26 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Gate the form on an actual, confirmed recovery session
+  // The reset link brings the person here with ?token=... in the address.
+  // If the link was already used or expired, we get ?error=INVALID_TOKEN instead.
   const [checkingSession, setCheckingSession] = useState(true);
   const [sessionValid, setSessionValid] = useState(false);
+  const [token, setToken] = useState("");
 
   useEffect(() => {
-    let resolved = false;
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get("token");
+    const err = params.get("error");
 
-    // Primary signal: Supabase fires this event once the recovery
-    // session from the callback redirect is actually live.
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "PASSWORD_RECOVERY" && session) {
-          resolved = true;
-          setSessionValid(true);
-          setCheckingSession(false);
-        }
-      }
-    );
+    if (t && !err) {
+      setToken(t);
+      setSessionValid(true);
+    } else {
+      setSessionValid(false);
+    }
 
-    // Fallback: in case the event already fired before this component
-    // mounted, or on a hard refresh, check for an existing session directly.
-    (async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!resolved) {
-        if (session) {
-          setSessionValid(true);
-        } else {
-          setSessionValid(false);
-        }
-        setCheckingSession(false);
-      }
-    })();
-
-    return () => {
-      listener?.subscription?.unsubscribe();
-    };
-  }, [supabase]);
+    setCheckingSession(false);
+  }, []);
 
   const checks = useMemo(
     () => ({
@@ -107,14 +86,20 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
 
-    const { error } = await supabase.auth.updateUser({
-      password,
+    const { error } = await authClient.resetPassword({
+      newPassword: password,
+      token,
     });
 
     setLoading(false);
 
     if (error) {
-      setMessage(error.message);
+      // Expired or already-used link: show the "Link expired" screen
+      if (error.code === "INVALID_TOKEN" || /token/i.test(error.message || "")) {
+        setSessionValid(false);
+        return;
+      }
+      setMessage(error.message || "Could not update your password. Please try again.");
       return;
     }
 

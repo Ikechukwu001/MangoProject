@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -15,7 +15,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import Container from "@/components/layout/Container";
-import { createClient } from "@/src/lib/supabase/client";
+import useUserProfile from "@/src/hooks/useUserProfile";
 
 const PREMIUM_PRICE = 3000;
 
@@ -28,47 +28,10 @@ function formatNaira(amount) {
 }
 
 export default function PricingPage() {
-  const supabase = createClient();
+  const { user, loading: loadingUser, isPremium, isPending } = useUserProfile();
 
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [loadingUser, setLoadingUser] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadUserData() {
-      const {
-        data: { user: authUser },
-      } = await supabase.auth.getUser();
-
-      if (!mounted) return;
-      setUser(authUser ?? null);
-
-      if (authUser) {
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("id, email, full_name, plan, premium_status")
-          .eq("id", authUser.id)
-          .maybeSingle();
-
-        if (!mounted) return;
-        setProfile(profileData || null);
-      }
-
-      setLoadingUser(false);
-    }
-
-    loadUserData();
-    return () => { mounted = false; };
-  }, [supabase]);
-
-  const isPremium =
-    profile?.plan === "premium" || profile?.premium_status === "active";
-
-  const isPending = profile?.premium_status === "pending";
 
   const handleUpgrade = async () => {
     setErrorMessage("");

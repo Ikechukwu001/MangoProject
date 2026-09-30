@@ -22,7 +22,6 @@ import {
 import Container from "@/components/layout/Container";
 import getPaperById from "@/lib/getPaperById";
 import questions from "@/src/data/questions";
-import { createClient } from "@/src/lib/supabase/client";
 import { useConfidence } from "@/src/hooks/useConfidence";
 
 function StatCard({ icon: Icon, label, value, tone = "default" }) {
@@ -318,7 +317,6 @@ function PremiumModal({
 export default function ExamPage() {
   const params = useParams();
   const router = useRouter();
-  const supabase = createClient();
 
   const paperId = params?.paperId;
 
@@ -372,31 +370,30 @@ export default function ExamPage() {
     }
   }, [isPremium]);
 
-  // Load the user + their profile once on mount.
+   // Load the user + their profile once on mount.
   useEffect(() => {
     let mounted = true;
 
     async function loadAuth() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      try {
+        const res = await fetch("/api/me", { cache: "no-store" });
 
-      if (!mounted) return;
+        if (!mounted) return;
 
-      if (!user) {
-        router.push("/");
-        return;
+        if (res.status === 401) {
+          router.push("/");
+          return;
+        }
+
+        const data = res.ok ? await res.json() : null;
+
+        if (!mounted) return;
+
+        setProfile(data?.profile || null);
+      } catch {
+        if (!mounted) return;
       }
 
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("id, email, full_name, plan, premium_status")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      if (!mounted) return;
-
-      setProfile(profileData || null);
       setAuthLoading(false);
     }
 
@@ -405,22 +402,28 @@ export default function ExamPage() {
     return () => {
       mounted = false;
     };
-  }, [supabase, router]);
+  }, [router]);
 
   // Poll for premium upgrades instead of a live Realtime subscription.
   // A live "postgres_changes" channel per exam session was the single
   // biggest Disk IO consumer on the Supabase project (realtime.list_changes).
   // Polling every 25s catches an in-exam upgrade just as well, at a tiny
   // fraction of the cost, and uses zero Realtime/WebSocket connections.
-  useEffect(() => {
+    useEffect(() => {
     if (!profile?.id) return;
 
     const pollInterval = setInterval(async () => {
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("id, email, full_name, plan, premium_status")
-        .eq("id", profile.id)
-        .maybeSingle();
+      let profileData = null;
+
+      try {
+        const res = await fetch("/api/me", { cache: "no-store" });
+        if (res.ok) {
+          const data = await res.json();
+          profileData = data?.profile ?? null;
+        }
+      } catch {
+        // network hiccup: try again on the next tick
+      }
 
       if (!profileData) return;
 
@@ -440,7 +443,7 @@ export default function ExamPage() {
     }, 25000); // every 25 seconds
 
     return () => clearInterval(pollInterval);
-  }, [profile?.id, profile?.plan, profile?.premium_status, supabase]);
+  }, [profile?.id, profile?.plan, profile?.premium_status]);
 
   useEffect(() => {
     if (!paperId) return;

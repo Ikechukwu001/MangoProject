@@ -1,7 +1,7 @@
 // netlify/functions/job-scraper.js
 
 const cheerio = require("cheerio");
-const { createClient } = require("@supabase/supabase-js");
+const { neon } = require("@neondatabase/serverless");
 
 const HEADERS = {
   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -163,10 +163,7 @@ async function scrapeJobberman() {
 // ── Main handler ──────────────────────────────────────────
 exports.handler = async () => {
   try {
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const sql = neon(process.env.DATABASE_URL);
 
     const [myJobMagJobs, jobbermanJobs] = await Promise.all([
       scrapeMyJobMag(),
@@ -180,15 +177,24 @@ exports.handler = async () => {
     let skipped = 0;
 
     for (const job of allJobs) {
-      const { error } = await supabase
-        .from("job_alerts")
-        .upsert(job, { onConflict: "job_url" });
-
-      if (error) {
+      try {
+        // New job -> added. Job already saved (same URL) -> its details are refreshed.
+        await sql`
+          INSERT INTO job_alerts (title, company, location, job_url, source, description, date)
+          VALUES (${job.title}, ${job.company}, ${job.location}, ${job.job_url},
+                  ${job.source}, ${job.description}, ${job.date})
+          ON CONFLICT (job_url) DO UPDATE SET
+            title = EXCLUDED.title,
+            company = EXCLUDED.company,
+            location = EXCLUDED.location,
+            source = EXCLUDED.source,
+            description = EXCLUDED.description,
+            date = EXCLUDED.date
+        `;
+        inserted++;
+      } catch (error) {
         console.error("Insert error:", error.message);
         skipped++;
-      } else {
-        inserted++;
       }
     }
 
