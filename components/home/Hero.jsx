@@ -74,7 +74,7 @@ export default function Hero() {
             </div>
 
             <h1 className="mt-5 max-w-[12ch] text-[2rem] font-bold leading-[1] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-6xl">
-              Practice smarter. Pass with confidence.
+              Practice Smarter. Pass with confidence.
             </h1>
 
             <p className="mt-5 max-w-xl text-[15px] leading-7 text-slate-600 sm:text-base sm:leading-8 lg:text-lg">

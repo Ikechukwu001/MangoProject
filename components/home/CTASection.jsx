@@ -5,7 +5,7 @@ export default function CTASection() {
   return (
     <section className="bg-slate-50 py-16 sm:py-20">
       <Container>
-        <div className="rounded-[32px] border border-slate-200 bg-white px-6 py-12 text-center shadow-sm sm:px-10">
+        <div className="rounded-4xl border border-slate-200 bg-white px-6 py-12 text-center shadow-sm sm:px-10">
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
             Start preparing smarter today
           </h2>

@@ -30,10 +30,12 @@ export const metadata = {
     "pharmacy technician past questions Nigeria",
     "PCN pharmacy technician exam",
     "pharmacy technician mock exam",
-    "pharmacy technician study platform",
+    "Pharmacy technician study platform",
     "Nigeria pharmacy technician certification",
     "PharmTechSuccess",
     "pharmacy technician exam preparation",
+    "pharmacy technician",
+    "Pharmacy Tech",
   ],
 
   // ── Canonical & Alternates ─────────────────────────────────────────────
@@ -66,7 +68,7 @@ export const metadata = {
     siteName,
     title: "PharmTechSuccess — Pass the National PreCertification Examination",
     description:
-      "Practice real CBT past questions, take timed mock exams, and track your performance. Built specifically for Nigerian Pharmacy Technician students.Built my iKECHUKWUFRONTEND",
+      "Practice real CBT past questions, take timed mock exams, and track your performance. Built specifically for Nigerian Pharmacy Technician students.Built By iKECHUKWUFRONTEND",
     images: [
       {
         url: "/og-image.jpg",

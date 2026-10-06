@@ -25,6 +25,7 @@ const navLinks = [
   { name: "Insights", href: "/insights" },
   { name: "Confidence", href: "/confidence" },
   { name: "Job Alerts", href: "/job-alerts", icon: BriefcaseBusiness },
+  { name: "Study Notes", href: "/study",},
 ];
 
 export default function Navbar() {
