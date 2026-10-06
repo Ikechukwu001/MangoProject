@@ -5,7 +5,6 @@ course: "BDT 152"
 courseTitle: "Basic Dispensing Theory I"
 order: 3
 readingTime: 8
-draft: true
 description: "Hard and soft gelatin capsules, capsule sizes, advantages and disadvantages, how hard capsules are filled, and how capsules are packaged, stored and taken."
 objectives:
   - "Define a capsule and name the main types"

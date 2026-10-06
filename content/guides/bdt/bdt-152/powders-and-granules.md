@@ -5,7 +5,6 @@ course: "BDT 152"
 courseTitle: "Basic Dispensing Theory I"
 order: 1
 readingTime: 9
-draft: true
 description: "What powders and granules are, the types of powder, how powders are compounded, and how granules are made by wet and dry granulation."
 objectives:
   - "Define powders and granules"

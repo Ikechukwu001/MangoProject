@@ -5,7 +5,6 @@ course: "BDT 152"
 courseTitle: "Basic Dispensing Theory I"
 order: 2
 readingTime: 10
-draft: true
 description: "What tablets are, why they are so popular, the excipients used, the steps of tablet making, and the types and purposes of tablet coating."
 objectives:
   - "Define a tablet and list the main types"
