@@ -56,9 +56,18 @@ const components = {
       />
     );
   },
+  // Inline code, for short terms inside a sentence.
   code: ({ node, ...props }) => (
     <code
       className="rounded bg-stone-100 px-1.5 py-0.5 text-sm text-stone-800"
+      {...props}
+    />
+  ),
+  // Fenced code blocks (used for sample prescriptions and labels).
+  // The [&_code] classes remove the inline-code styling inside the box.
+  pre: ({ node, ...props }) => (
+    <pre
+      className="my-6 overflow-x-auto whitespace-pre-wrap break-words rounded-xl border border-stone-200 bg-stone-100 p-4 text-sm leading-6 text-stone-800 [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-sm"
       {...props}
     />
   ),
