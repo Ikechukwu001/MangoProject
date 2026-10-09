@@ -31,6 +31,22 @@ function toArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+// Lessons write large numbers with a space as the thousands separator (1 000).
+// Swap that space for a non-breaking space so a number never splits across two
+// lines on a small screen. Authors keep writing normal spaces in the files.
+function keepNumbersTogether(value) {
+  if (typeof value === "string") {
+    return value.replace(/(\d) (?=\d{3}(?!\d))/g, "$1 ");
+  }
+  if (Array.isArray(value)) return value.map(keepNumbersTogether);
+  if (value && Object.getPrototypeOf(value) === Object.prototype) {
+    return Object.fromEntries(
+      Object.entries(value).map(([k, v]) => [k, keepNumbersTogether(v)])
+    );
+  }
+  return value;
+}
+
 function readGuide(subject, courseSlug, slug) {
   if (![subject, courseSlug, slug].every((s) => SEGMENT.test(s))) return null;
 
@@ -42,7 +58,9 @@ function readGuide(subject, courseSlug, slug) {
     return null;
   }
 
-  const { data, content } = matter(raw);
+  const parsed = matter(raw);
+  const data = keepNumbersTogether(parsed.data);
+  const content = keepNumbersTogether(parsed.content);
 
   // Add `draft: true` to a lesson's frontmatter to hide it from the live site.
   // Drafts still show up while you run `npm run dev`, marked as "Draft".
