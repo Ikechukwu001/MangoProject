@@ -24,27 +24,48 @@ function VerifyContent() {
       return;
     }
 
-    async function verify() {
-      try {
-        const res = await fetch(`/api/paystack/verify?reference=${reference}`);
-        const data = await res.json();
+async function verify() {
+  try {
+    const res = await fetch(
+      `/api/paystack/verify?reference=${encodeURIComponent(reference)}`,
+      { cache: "no-store" }
+    );
 
-        if (res.ok && data.success) {
-          setStatus("success");
-          setTimeout(() => router.push("/papers"), 4000);
-        } else {
-          setStatus("error");
-          setErrorMessage(
-            data.error || "Payment verification failed. Please contact support."
-          );
-        }
-      } catch {
-        setStatus("error");
-        setErrorMessage("A network error occurred. Please contact support.");
-      }
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      setStatus("success");
+      setTimeout(() => router.push("/papers"), 4000);
+      return;
     }
 
-    verify();
+    setStatus("error");
+
+    const paymentStatus = data.paystack_status;
+
+    if (
+      paymentStatus === "pending" ||
+      paymentStatus === "ongoing" ||
+      paymentStatus === "processing"
+    ) {
+      setErrorMessage(
+        "Your payment has not been confirmed yet. If you did not complete the payment, return to Pricing and start a new payment."
+      );
+    } else {
+      setErrorMessage(
+        "Your payment was not completed or could not be verified. You can return to Pricing and try again. A fresh payment session will be created."
+      );
+    }
+  } catch {
+    setStatus("error");
+    setErrorMessage(
+      "We could not verify your payment because of a network error. Check your payment status before attempting another payment."
+    );
+  }
+}
+
+verify();
+
   }, [reference, router]);
 
   if (status === "verifying") {
@@ -104,7 +125,7 @@ function VerifyContent() {
           href="/pricing"
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
         >
-          Back to Pricing
+          Try a New Payment
         </Link>
         <a
           href={`https://wa.me/2348157902426?text=${encodeURIComponent(
